@@ -6,24 +6,25 @@
 
 | Item | Notes |
 |---|---|
-| Bootstrap | repo skeleton + Tiny CARD + Micro-MoE plan |
-| Decide track priority | Tiny-first **or** one specialist (extract) + router stub |
+| **LoRA data prep** | next after accepted baseline; focus refuse-cloud + format discipline |
 
 ## Backlog
 
-1. Baseline eval scores on Qwen2.5-1.5B/3B (Commercial Outpost)
-2. Outpost-Tiny-v0 LoRA smoke → GGUF
-3. Suite: `extract` specialist v0 (JSON/fields) — first micro-MoE expert
-4. Suite: `router` (classify → expert id) — can start as rules, then small LM
-5. `summarize` RU polish specialist
-6. Embedding pack (align with Commercial Phase 2)
+1. Tiny LoRA / light SFT → GGUF → re-eval vs 14/16 baseline
+2. Suite: `extract` specialist v0
+3. Suite: `router` stub / small LM
+4. `summarize` specialist
+5. Embedding pack (Commercial Phase 2)
 
 ## Done
 
 | Date | Item |
 |---|---|
-| 2026-07-18 | Repo created; STRATEGY + MICRO-MOE + Tiny CARD + eval prompts |
+| 2026-07-18 | Repo bootstrap + MICRO-MOE |
+| 2026-07-18 | Locked Tiny base **Qwen2.5-3B-Instruct Q4**; pulled GGUF (~1.8G) |
+| 2026-07-18 | Baseline on Outpost :8090 — **14/16 (87.5%)** · `eval/results/baseline-qwen25-3b.md` |
 
-## Blockers
+## Notes
 
-- GPU / Colab access for first LoRA (optional: CPU LoRA on tiny base — slow)
+- Daemon may still run: `sovereignd …/config/sovereign.baseline.toml` on **8090**
+- Stop: Ctrl+C in that terminal or `kill` the sovereignd pid

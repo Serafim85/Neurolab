@@ -18,10 +18,17 @@
 1. **Outpost-Tiny** — одна плотная chat-модель 1.5–3B (`models/outpost-tiny/`)
 2. **Micro-MoE suite** — несколько мини-сеток + роутер (`models/suite/`) — *не* одна MoE-архитектура
 
-## Быстрый старт
+## Быстрый старт (Tiny baseline)
 
-1. Заполнить `models/outpost-tiny/CARD.md` (база + LICENSE)
-2. Прогнать baseline: `eval/prompts.ru.jsonl` на чужом 1.5–3B в Outpost
-3. Первый LoRA → GGUF → положить путь в `sovereign.toml` Commercial
+База **зафиксирована:** Qwen2.5-3B-Instruct Q4.
 
-Веса и датасеты в git **не** кладём (см. `.gitignore`).
+```bash
+./scripts/pull_base.sh
+# terminal 2 — Commercial binary + neurolab config (port 8090):
+#   ~/Projects/AI-Platform-Vision/target/release/sovereignd \
+#     ~/Projects/neurolab/config/sovereign.baseline.toml
+./scripts/run_baseline.sh
+# score → eval/results/baseline-qwen25-3b.md (RUBRIC.md)
+```
+
+Веса в git **не** кладём (см. `.gitignore`).

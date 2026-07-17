@@ -7,6 +7,13 @@
 *.onnx
 artifacts/**
 !artifacts/.gitkeep
+!artifacts/base/
+artifacts/base/**
+!artifacts/base/.gitkeep
+!artifacts/base/SHA256.txt
+eval/results/raw/
+*.jsonl
+!eval/prompts.ru.jsonl
 datasets/**
 !datasets/.gitkeep
 !datasets/README.md

@@ -1,0 +1,1 @@
+d44e2c5d1ec3cae1d5cf6a744bee528e46c65a1e66e741fa92730967e7d625bb  Qwen2.5-3B-Instruct-Q4_K_M.gguf
