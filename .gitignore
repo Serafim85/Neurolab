@@ -1,0 +1,30 @@
+# Weights & large artifacts — never commit
+*.gguf
+*.bin
+*.safetensors
+*.pt
+*.pth
+*.onnx
+artifacts/**
+!artifacts/.gitkeep
+datasets/**
+!datasets/.gitkeep
+!datasets/README.md
+
+# Python / train
+.venv/
+venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+wandb/
+runs/
+outputs/
+lora_out/
+checkpoints/
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp

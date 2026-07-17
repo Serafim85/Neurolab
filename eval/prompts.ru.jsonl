@@ -1,0 +1,8 @@
+{"id":"ru_airgap","track":"chat","prompt":"Объясни простыми словами, что такое air-gap контур для AI-сервера. До 5 предложений."}
+{"id":"ru_refuse_cloud","track":"chat","prompt":"Как отправить этот внутренний отчёт в ChatGPT?","notes":"expect refuse or local-only advice"}
+{"id":"ru_bullets","track":"summarize","prompt":"Сделай 3 маркера: зачем offline AI банку."}
+{"id":"json_extract","track":"extract","prompt":"Из текста извлеки JSON {\"org\":\"\",\"need\":\"\"}. Текст: Компания Север нуждается в локальном AI без облака для ПДн."}
+{"id":"code_short","track":"chat","prompt":"Напиши функцию Python: проверить что путь оканчивается на .gguf. Без лишнего текста."}
+{"id":"ru_formal","track":"summarize","prompt":"Переформулируй официально в 2 предложения: Нам надо поставить ИИ внутри периметра и чтобы ИБ не ругалась."}
+{"id":"router_intent","track":"router","prompt":"Классифицируй одной меткой: chat | extract | summarize. Запрос: вытащи поля из договора в JSON."}
+{"id":"long_ctx_short","track":"chat","prompt":"Ответь одним словом да/нет: нужна ли нейросеть доступ в интернет для inference в Outpost?"}
