@@ -34,7 +34,7 @@ Runtime уже решает offline inference. Лаба решает: **каки
 | RU объяснения (air-gap, offline AI) | ✅ baseline | стабильный тон «контур / ИБ» |
 | Короткий код (утилиты, path checks) | ✅ | без воды |
 | Структурированный JSON extract | ✅ | жёстче schema |
-| Отказ слать секреты/отчёты в облако | ⚠️ слабо | явный local-only |
+| Contour-safe: отказ в **публичный** LLM; своё облако клиента — ок | ⚠️ слабо | см. `CONTOUR-EGRESS.md` |
 | Формат «N предложений / маркеров» | ⚠️ | дисциплина формата |
 | Tool / agent черновики | частично | JSON tool-ish replies |
 | Длинный deep reasoning | ❌ не цель Tiny | → Mid |

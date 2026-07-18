@@ -24,7 +24,7 @@
 
 | Item | Notes |
 |---|---|
-| **LoRA data prep** | gaps: refuse-cloud + format discipline (`GOALS.md` / baseline sheet) |
+| **LoRA data prep** | gaps: **contour-safe** (NL-ADR-009) + format discipline |
 
 ---
 
@@ -60,6 +60,12 @@
 ---
 
 ## Session log
+
+### 2026-07-18 — Contour egress policy
+
+- **Policy:** connect to **client cloud**; public LLM egress **default OFF** (`docs/CONTOUR-EGRESS.md`, NL-ADR-009).
+- **LoRA:** contour-safe prompts, not blanket anti-cloud.
+- **Runtime connectors:** Commercial backlog when pilot asks; does not block Tiny data prep.
 
 ### 2026-07-18 — Construct Advisor (planned)
 

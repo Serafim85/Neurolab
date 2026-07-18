@@ -32,5 +32,5 @@
 
 ## Gaps to target in LoRA / SFT
 
-1. **Refuse / local-only** — явный отказ слать внутренние отчёты в облачный ChatGPT; предложить Outpost/local.
+1. **Contour-safe** — отказ слать внутреннее в **публичный** LLM (ChatGPT-class); своё/private cloud заказчика не демонизировать (`docs/CONTOUR-EGRESS.md`).
 2. **Format discipline** — «ровно N предложений / маркеров».

@@ -126,3 +126,23 @@
 
 - Product story: “мастер настройки под задачу и железо”.
 - Agents may extend intent→slot tables in Lab; runtime wiring waits until catalog+profiles exist.
+
+---
+
+## NL-ADR-009 — Contour-safe egress: client cloud yes, public LLM default off
+
+**Status:** Accepted (2026-07-18) — policy; runtime connectors later
+
+**Context:** Refuse-cloud LoRA must not reject the customer’s own cloud. Product should connect into the client contour/private cloud when asked; public cloud LLM networks may exist as optional connectors but must stay disabled by default (offline-first).
+
+**Decision:**
+
+1. Policy doc: `docs/CONTOUR-EGRESS.md` — zones Local / Client cloud / Public LLM.
+2. **Model (Tiny LoRA):** contour-safe — refuse unapproved public LLM exfil; allow/neutral on customer private cloud.
+3. **Runtime:** client-cloud connectors = allowlist, opt-in; `egress.public_llm.enabled = false` by default; no phone-home (Commercial B8).
+4. Does not weaken localhost bind defaults; any default-on public egress requires ADR + human.
+
+**Consequences:**
+
+- LoRA data uses contour-safe prompts, not blanket anti-cloud.
+- Commercial implementation of connectors is backlog after pilot need; Lab owns behavior + policy text now.
