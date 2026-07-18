@@ -104,6 +104,7 @@ Commercial остаётся единственным местом пилотно
 7. **Passport** — LICENSE, SHA, base, дата в CARD.
 8. **Min resource / max result** — LoRA и 3B до 14B; profile `lite` на слабом железе.
 9. **Reliability & quality** — скрипты + rubric; autotune только с audit и lock after boot.
+
 ---
 
 ## 6. Текущий фокус (синхронизировать со STATUS)
