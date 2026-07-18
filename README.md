@@ -1,34 +1,49 @@
 # Нейролаб (neurolab)
 
-Внутренняя лаборатория **своих весов** для Outpost.
+Инженерная лаборатория **своих весов** для [Outpost](https://outpost-llm.com)  
+Commercial runtime: `~/Projects/AI-Platform-Vision`
 
-| | |
+**Девизы:** надёжность · качество · минимум ресурсов → максимум результата.
+
+---
+
+## Агентам: начни здесь
+
+1. **[`AGENTS.md`](AGENTS.md)** — правила сессии  
+2. **[`STATUS.md`](STATUS.md)** — что в работе  
+3. **[`docs/INDEX.md`](docs/INDEX.md)** — полная карта docs  
+
+| Doc | Тема |
 |---|---|
-| **Commercial runtime** | `~/Projects/AI-Platform-Vision` |
-| **Старый product Lab** | `~/Projects/sov-lab` (API/Workbench R&D) |
-| **Эта lab** | модели: Tiny, suite мини-специалистов («микро-MoE»), eval, export GGUF |
+| [ARCHITECTURE](docs/ARCHITECTURE.md) | архитектура сети и системы |
+| [GOALS](docs/GOALS.md) | цели и задачи |
+| [INTEGRATION](docs/INTEGRATION.md) | встраивание в Outpost |
+| [SCALE-PLAN](docs/SCALE-PLAN.md) | масштабирование |
+| [ENGINEERING](docs/ENGINEERING.md) | стиль, логи, DoD |
+| [MICRO-MOE](docs/MICRO-MOE.md) | suite мини-экспертов |
 
-Не продаём пилотам напрямую. Цель: train → GGUF → smoke в `sovereignd`.
-
-Стратегия: [`docs/STRATEGY.md`](docs/STRATEGY.md) · Micro-MoE: [`docs/MICRO-MOE.md`](docs/MICRO-MOE.md)  
-Канон в Commercial: `AI-Platform-Vision/docs/MODEL-SOVEREIGNTY-PATH.md` (ADR-045)
+---
 
 ## Треки
 
-1. **Outpost-Tiny** — одна плотная chat-модель 1.5–3B (`models/outpost-tiny/`)
-2. **Micro-MoE suite** — несколько мини-сеток + роутер (`models/suite/`) — *не* одна MoE-архитектура
+| | |
+|---|---|
+| **A — Outpost-Tiny** | dense chat на Qwen2.5-3B → LoRA → GGUF |
+| **B — Micro-MoE suite** | extract / summarize / router как отдельные GGUF |
 
-## Быстрый старт (Tiny baseline)
+Сейчас: **Track A baseline accepted (14/16)** → подготовка LoRA.
 
-База **зафиксирована:** Qwen2.5-3B-Instruct Q4.
+---
+
+## Quick start (baseline)
 
 ```bash
-./scripts/pull_base.sh
-# terminal 2 — Commercial binary + neurolab config (port 8090):
+./scripts/pull_base.sh   # if GGUF missing
+# terminal 2:
 #   ~/Projects/AI-Platform-Vision/target/release/sovereignd \
 #     ~/Projects/neurolab/config/sovereign.baseline.toml
 ./scripts/run_baseline.sh
-# score → eval/results/baseline-qwen25-3b.md (RUBRIC.md)
+# score → eval/results/baseline-qwen25-3b.md
 ```
 
-Веса в git **не** кладём (см. `.gitignore`).
+Веса в git не кладём (`.gitignore`).

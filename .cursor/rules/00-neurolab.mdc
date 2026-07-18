@@ -1,0 +1,16 @@
+---
+description: Neurolab agent rules — read AGENTS.md first
+alwaysApply: true
+---
+
+# Neurolab
+
+1. Read `AGENTS.md` first every session.
+2. Then `STATUS.md` and `docs/DECISIONS.md`.
+3. Architecture: `docs/ARCHITECTURE.md`. Engineering: `docs/ENGINEERING.md`.
+4. Mottos: **reliability** and **quality**; minimize resources for maximum measured result.
+5. One task per session from STATUS. Measure before/after (eval).
+6. Never commit `.gguf`, raw datasets, or secrets.
+7. Do not implement Outpost runtime features here — Commercial repo only.
+8. Dense first; micro-MoE = separate GGUFs; no arch-MoE without ADR + human.
+9. End session: update `STATUS.md` Session log; ADR if decision changed.

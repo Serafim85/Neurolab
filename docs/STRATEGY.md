@@ -1,30 +1,28 @@
-# Neurolab strategy
+# Neurolab strategy (short)
 
-> Linked: Commercial `docs/MODEL-SOVEREIGNTY-PATH.md` · ADR-018 / ADR-045 / ADR-046
+> Полная картина: [`INDEX.md`](INDEX.md) · [`ARCHITECTURE.md`](ARCHITECTURE.md) · [`SCALE-PLAN.md`](SCALE-PLAN.md)  
+> Commercial: `MODEL-SOVEREIGNTY-PATH.md` · ADR-018 / 045 / 046
 
 ## Goal
 
 Свой модельный supply chain для внутренних контуров (enterprise + гос/КИИ):  
 допустимые веса → Outpost runtime → без зарубежного API.
 
-## Two tracks (оба валидны)
+## Two tracks
 
 | Track | Что | Зачем |
 |---|---|---|
-| **A — Tiny monolith** | одна dense 1.5–3B chat | бренд, Workstation Lite, 2-й слот |
+| **A — Tiny monolith** | dense ~3B chat (Qwen2.5) | бренд, Workstation Lite, 2-й слот |
 | **B — Micro-MoE suite** | несколько мини-GGUF + router | узкие задачи, мало RAM, agent stages |
 
-**Рекомендация:** вести **оба**, но не параллелить обучение.  
-Порядок: **eval harness → Tiny-v0 LoRA smoke → один specialist (extract) → router**.
+**Порядок:** eval → Tiny LoRA → extract → router. Mid/Large — по `SCALE-PLAN.md`.
 
-Потом: Mid 7–14B (мощный «свой» ответ госу). Large/arch-MoE — позже.
+## Dense first
 
-## Dense first inside each card
-
-Каждая мини-сеть — **плотная**. «MoE» — на уровне **продукта** (кто вызван), не Mixtral-слоёв в одном файле.
+Каждая мини-сеть — плотная. «MoE» — на уровне продукта (`MICRO-MOE.md`).
 
 ## Success metrics
 
-- GGUF грузится в Commercial Outpost
-- Eval ≥ baseline на целевых промптах трека
-- CARD.md: LICENSE, base, SHA, provenance (язык для ИБ)
+- GGUF в Outpost + CARD (LICENSE, SHA)
+- Eval ≥ baseline на целевых промптах
+- Воспроизводимый скрипт (`ENGINEERING.md`)
