@@ -6,6 +6,7 @@
 | [`../STATUS.md`](../STATUS.md) | Done / In progress / Backlog / Session log |
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | Архитектура сети и Lab→Outpost |
 | [`CONSTRUCT.md`](CONSTRUCT.md) | **Управляемый конструкт** слотов + автоподстройка к железу |
+| [`INTELLECTUAL-CANON.md`](INTELLECTUAL-CANON.md) | **Канон** — книги, статьи, Anthropic/OpenAI, векторы будущего |
 | [`GOALS.md`](GOALS.md) | Цели и задачи моделей |
 | [`INTEGRATION.md`](INTEGRATION.md) | Куда и как встраиваем |
 | [`SCALE-PLAN.md`](SCALE-PLAN.md) | Масштабирование Tiny→Mid→Large / suite |

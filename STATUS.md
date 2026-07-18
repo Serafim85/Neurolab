@@ -13,6 +13,7 @@
 |---|---|
 | Agent docs | ✅ AGENTS + architecture pack |
 | **Construct** | ✅ schema v0.1 + `docs/CONSTRUCT.md` (NL-ADR-006) |
+| **Canon** | ✅ `docs/INTELLECTUAL-CANON.md` (NL-ADR-007) |
 | Tiny base | ✅ Qwen2.5-3B Q4 locked + pulled |
 | Baseline | ✅ **14/16 (87.5%)** |
 | LoRA | 🔜 data prep next |
@@ -47,6 +48,7 @@
 | 2026-07-18 | Locked Tiny base; pull; baseline 14/16 |
 | 2026-07-18 | **Full agent documentation pack** — AGENTS, ARCHITECTURE, GOALS, INTEGRATION, SCALE-PLAN, ENGINEERING, DECISIONS, INDEX, cursor rule |
 | 2026-07-18 | **Model Construct (NL-ADR-006)** — `docs/CONSTRUCT.md` + `construct/example.toml`: слоты, router, hardware profiles, autotune v1 |
+| 2026-07-18 | **Intellectual Canon (NL-ADR-007)** — книги, papers, Anthropic/OpenAI, future vectors → Outpost lineage |
 
 ---
 
@@ -57,6 +59,13 @@
 ---
 
 ## Session log
+
+### 2026-07-18 — Intellectual Canon
+
+- **Goal:** мощная будущая база линейки — книги, статьи, практики frontier labs.
+- **Done:** `docs/INTELLECTUAL-CANON.md` + NL-ADR-007; столпы dense/scaling/post-train/Construct/interpretability; reading order.
+- **Filter:** Contour + Measure + Construct; не клонировать GPT-кластеры.
+- **Next:** LoRA data prep (canon: LoRA + InstructGPT + Qwen2.5 post-train).
 
 ### 2026-07-18 — Model Construct foundation
 

@@ -84,3 +84,24 @@
 - Agents design new capabilities as **slots + skills**, not one-off forks.
 - Changing locked Tiny *base* still needs ADR; adding an `extract` slot does not.
 - Over-automation (continuous model swap mid-flight, auto LoRA) is out of scope until explicit ADR.
+
+---
+
+## NL-ADR-007 — Intellectual Canon for the model lineage
+
+**Status:** Accepted (2026-07-18)
+
+**Context:** Development needs a shared intellectual base (books, papers, lab engineering notes) aimed at the future, not ad-hoc blog following. Outpost lineage must stay powerful and forward-compatible while remaining lean (offline, Construct, min→max).
+
+**Decision:**
+
+1. Maintain living canon: `docs/INTELLECTUAL-CANON.md`.
+2. **Pillars:** dense Transformer first; scaling laws (Kaplan/Chinchilla); post-training as primary lever; product Construct before arch-MoE; cautious test-time compute; interpretability/audit for contour; GGUF local stack; systems reliability.
+3. Agents cite canon (paper/book + adopt/defer) in Session log or ADR when changing architecture, train recipe, or scale step.
+4. Curate Anthropic (interpretability, inverse scaling) and OpenAI (training systems) as **engineering literacy**, not as blueprints to clone frontier clusters.
+5. Refresh canon quarterly or on base/Mid transitions; new entries need one-line “take / don’t take for Outpost”.
+
+**Consequences:**
+
+- Reading lists are filtered by Contour + Measure + Construct.
+- Arch-MoE and cluster networking stay deferred until L6/dc evidence.

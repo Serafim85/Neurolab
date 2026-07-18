@@ -46,6 +46,7 @@ Commercial остаётся единственным местом пилотно
 | **`STATUS.md`** | Done / In progress / Backlog / Session log |
 | **`docs/ARCHITECTURE.md`** | архитектура сети и системы Lab→Outpost |
 | **`docs/CONSTRUCT.md`** | гибкий конструкт слотов + профили железа (NL-ADR-006) |
+| **`docs/INTELLECTUAL-CANON.md`** | интеллектуальный канон линейки (книги, papers, lab notes) |
 | **`construct/example.toml`** | schema манифеста микросетей |
 | **`docs/GOALS.md`** | цели, задачи, use-cases моделей |
 | **`docs/INTEGRATION.md`** | куда и как встраиваем в Outpost |
@@ -67,7 +68,8 @@ Commercial остаётся единственным местом пилотно
 1. Прочитать **`STATUS.md`** — не дублировать сделанное.
 2. Прочитать **`docs/DECISIONS.md`** — не переоткрывать принятое.
 3. Сверить **`docs/ARCHITECTURE.md`** § Current focus — одна задача.
-4. Взять **одну** работу из In progress или top Backlog.
+4. При arch/train выборе — глянуть **`docs/INTELLECTUAL-CANON.md`** §2–3.
+5. Взять **одну** работу из In progress или top Backlog.
 
 ### Во время
 
@@ -97,11 +99,11 @@ Commercial остаётся единственным местом пилотно
 2. **One lever** — одна переменная за итерацию (данные *или* rank *или* base).
 3. **Dense first** — не arch-MoE на старте; micro-MoE = отдельные GGUF + router.
 4. **Construct-first evolution** — новая способность = слот + skills/profile (`docs/CONSTRUCT.md`), не форк «одной сети».
-5. **Ship as GGUF** — нет успеха без загрузки в Outpost.
-6. **Passport** — LICENSE, SHA, base, дата в CARD.
-7. **Min resource / max result** — LoRA и 3B до 14B; profile `lite` на слабом железе.
-8. **Reliability & quality** — скрипты + rubric; autotune только с audit и lock after boot.
-
+5. **Canon-backed choices** — arch/train/scale решения опираются на `docs/INTELLECTUAL-CANON.md` (cite adopt/defer).
+6. **Ship as GGUF** — нет успеха без загрузки в Outpost.
+7. **Passport** — LICENSE, SHA, base, дата в CARD.
+8. **Min resource / max result** — LoRA и 3B до 14B; profile `lite` на слабом железе.
+9. **Reliability & quality** — скрипты + rubric; autotune только с audit и lock after boot.
 ---
 
 ## 6. Текущий фокус (синхронизировать со STATUS)

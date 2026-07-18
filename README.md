@@ -17,6 +17,7 @@ Commercial runtime: `~/Projects/AI-Platform-Vision`
 |---|---|
 | [ARCHITECTURE](docs/ARCHITECTURE.md) | архитектура сети и системы |
 | [CONSTRUCT](docs/CONSTRUCT.md) | **гибкий конструкт** слотов + автоподстройка к железу |
+| [INTELLECTUAL-CANON](docs/INTELLECTUAL-CANON.md) | книги, статьи, Anthropic/OpenAI, векторы будущего |
 | [GOALS](docs/GOALS.md) | цели и задачи |
 | [INTEGRATION](docs/INTEGRATION.md) | встраивание в Outpost |
 | [SCALE-PLAN](docs/SCALE-PLAN.md) | масштабирование |
