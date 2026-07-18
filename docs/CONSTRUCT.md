@@ -30,15 +30,15 @@
 ```text
 user intent + hardware ──► [Advisor] ──► proposed construct patch
                                               │
-construct.toml � intent + hardware ──► [Advisor] ──► proposed construct patch
-                                              │
-construct.toml ◄─────────────────────────────┘
+                                              ▼
+construct.toml ◄──────────────────── human Accept
   ├── catalog[]     # слоты: id, path/gguf, role, ram_mb, skills
   ├── router        # rules | model | pipeline
   ├── profiles[]    # S / M / L железо → какие слоты on
   ├── policies      # load: sequential|warm|parallel; autotune
   └── provenance    # version, cards, sha
 ```
+
 ---
 
 ## 3. Принципы (заложить сразу)

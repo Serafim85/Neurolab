@@ -105,3 +105,24 @@
 
 - Reading lists are filtered by Contour + Measure + Construct.
 - Arch-MoE and cluster networking stay deferred until L6/dc evidence.
+
+---
+
+## NL-ADR-008 — Construct Advisor (intent × hardware → propose)
+
+**Status:** Accepted as **planned** (2026-07-18) — design only; not Phase-1 blocking
+
+**Context:** Founder proposes a small evaluator agent that reads user intent and system params, then recommends the model variant the hardware can run and the task needs — custom setup for concrete jobs.
+
+**Decision:**
+
+1. Adopt as **Construct Advisor** in `docs/CONSTRUCT.md` §7b (implementation step S6).
+2. Output is always **propose + human Accept** (or rules-only A1), never silent mid-session model swap.
+3. v0 path: **rules + skill tags + RAM filter**; LM advisor optional later (A2).
+4. Does not block Tiny LoRA or Construct S0–S4.
+5. Advisor selects only from installed catalog (or explicitly suggests pull) — no invented 70B.
+
+**Consequences:**
+
+- Product story: “мастер настройки под задачу и железо”.
+- Agents may extend intent→slot tables in Lab; runtime wiring waits until catalog+profiles exist.
