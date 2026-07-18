@@ -88,22 +88,22 @@ path = "/Users/valentin/Projects/neurolab/artifacts/base/Qwen2.5-3B-Instruct-Q4_
 
 ---
 
-## 5. Micro-MoE в продукте
+## 5. Construct + Micro-MoE в продукте
 
 ```text
-neurolab/models/suite/extract/*.gguf
-neurolab/models/outpost-tiny/*.gguf
+neurolab/construct/example.toml  (+ pack construct.toml)
+neurolab artifacts/*.gguf
         ↓
-Commercial config/agents.toml  (Gate B)
-  stage classify → router rules or small model
-  stage extract  → outpost-extract
-  stage write    → outpost-tiny
+Outpost loads construct (Gate B+ target)
+  profile auto|lite|… → active slots
+  router → slot
+  fallback → defaults.slot
 ```
 
-До Gate B: один active GGUF; suite только готовим в Lab.
+Пока runtime construct не в Commercial: эквивалент — `agents.toml` catalog + pipelines (`MULTI-MODEL-AGENTS.md`).  
+Манифест Lab — **superset** и целевой pack format (`docs/CONSTRUCT.md`).
 
-Документ продукта: Commercial `docs/MULTI-MODEL-AGENTS.md`.
-
+До Gate B: один active GGUF; слоты `extract`/`summarize` готовим в Lab с `enabled = false`.
 ---
 
 ## 6. Контур заказчика (air-gap)

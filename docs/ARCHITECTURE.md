@@ -7,8 +7,9 @@
 ## 1. One-liner
 
 **Нейролаб проектирует и варит веса; Outpost исполняет их offline.**  
-Архитектура «сети» на старте — **плотный decoder-only LLM** (база Qwen2.5); «мощность» масштабируем размером и suite специалистов, не своим CUDA-стеком.
+Архитектура «сети» на старте — **плотный decoder-only LLM** (база Qwen2.5); эволюция — через **Model Construct** (слоты микросетей + профили железа), не через разовую монолитную клятву.
 
+Полный контракт гибкости: **`docs/CONSTRUCT.md`** + `construct/example.toml`.
 ---
 
 ## 2. Два слоя архитектуры
@@ -73,27 +74,32 @@
 
 ---
 
-## 4. Micro-MoE (продуктовая архитектура экспертов)
+## 4. Model Construct + Micro-MoE
 
-Не слои MoE внутри одного чекпоинта, а **граф специалистов**:
+Не слои MoE внутри одного чекпоинта, а **управляемый конструкт** — каталог слотов, которые можно добавлять/убирать/настраивать:
 
 ```text
-                 ┌─────────┐
-                 │ router  │  rules → later small LM
-                 └────┬────┘
-           ┌──────────┼──────────┐
-           ▼          ▼          ▼
-      ┌────────┐ ┌─────────┐ ┌──────────┐
-      │ extract│ │summarize│ │chat-tiny │
-      │ GGUF   │ │ GGUF    │ │ GGUF     │
-      └────────┘ └─────────┘ └──────────┘
+construct.toml
+    profiles (lite → dc) ── autotune by RAM/GPU
+            │
+            ▼
+       active slots[] ◄── enable/disable / BYOM path
+            │
+            ▼
+         router (rules → model)
+            │
+     ┌──────┼──────┐
+     ▼      ▼      ▼
+  chat  extract  summarize   … future slots
 ```
 
-Каждый эксперт — **dense** мини-модель (часто тот же backbone + свой LoRA).  
-Исполнение в Outpost: sequential swap / ModelPool (Commercial ADR-031).
+Каждый слот — **dense** GGUF (+ CARD). Исполнение в Outpost: ModelPool / agents (ADR-031), load_policy sequential|warm.
 
-Детали: `docs/MICRO-MOE.md`.
-
+| Документ | Что |
+|---|---|
+| `docs/CONSTRUCT.md` | гибкость, профили, автоподстройка, эволюция |
+| `construct/example.toml` | schema v0.1 |
+| `docs/MICRO-MOE.md` | мотивация suite экспертов |
 ---
 
 ## 5. Потоки данных (Lab)

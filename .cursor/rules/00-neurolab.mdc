@@ -13,4 +13,5 @@ alwaysApply: true
 6. Never commit `.gguf`, raw datasets, or secrets.
 7. Do not implement Outpost runtime features here — Commercial repo only.
 8. Dense first; micro-MoE = separate GGUFs; no arch-MoE without ADR + human.
-9. End session: update `STATUS.md` Session log; ADR if decision changed.
+9. Evolve via **Model Construct** slots/profiles (`docs/CONSTRUCT.md`) — not one-off monolith forks.
+10. End session: update `STATUS.md` Session log; ADR if decision changed.

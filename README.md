@@ -16,6 +16,7 @@ Commercial runtime: `~/Projects/AI-Platform-Vision`
 | Doc | Тема |
 |---|---|
 | [ARCHITECTURE](docs/ARCHITECTURE.md) | архитектура сети и системы |
+| [CONSTRUCT](docs/CONSTRUCT.md) | **гибкий конструкт** слотов + автоподстройка к железу |
 | [GOALS](docs/GOALS.md) | цели и задачи |
 | [INTEGRATION](docs/INTEGRATION.md) | встраивание в Outpost |
 | [SCALE-PLAN](docs/SCALE-PLAN.md) | масштабирование |

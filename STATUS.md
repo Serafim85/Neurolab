@@ -12,11 +12,11 @@
 | Area | State |
 |---|---|
 | Agent docs | ✅ AGENTS + architecture pack |
+| **Construct** | ✅ schema v0.1 + `docs/CONSTRUCT.md` (NL-ADR-006) |
 | Tiny base | ✅ Qwen2.5-3B Q4 locked + pulled |
 | Baseline | ✅ **14/16 (87.5%)** |
 | LoRA | 🔜 data prep next |
-| Micro-MoE | cards only (not trained) |
-
+| Micro-MoE | cards + construct slots (not trained) |
 ---
 
 ## In progress
@@ -30,12 +30,13 @@
 ## Backlog
 
 1. Tiny LoRA / light SFT → GGUF → re-eval vs 14/16
-2. Suite `extract` specialist v0
-3. Router rules stub for Commercial Gate B
-4. `summarize` specialist
-5. Embedding pack (align Commercial Phase 2)
-6. Private git remote for neurolab (human)
-
+2. Construct S1: validate script for `construct/*.toml`
+3. Suite `extract` specialist v0 → enable slot in construct
+4. Construct pack layout (`packs/<id>/`)
+5. Commercial S3–S5: load construct + profile autotune (Gate B+)
+6. `summarize` specialist
+7. Embedding pack (align Commercial Phase 2)
+8. Private git remote for neurolab (human)
 ---
 
 ## Done
@@ -45,6 +46,7 @@
 | 2026-07-18 | Repo bootstrap + MICRO-MOE strategy |
 | 2026-07-18 | Locked Tiny base; pull; baseline 14/16 |
 | 2026-07-18 | **Full agent documentation pack** — AGENTS, ARCHITECTURE, GOALS, INTEGRATION, SCALE-PLAN, ENGINEERING, DECISIONS, INDEX, cursor rule |
+| 2026-07-18 | **Model Construct (NL-ADR-006)** — `docs/CONSTRUCT.md` + `construct/example.toml`: слоты, router, hardware profiles, autotune v1 |
 
 ---
 
@@ -55,6 +57,13 @@
 ---
 
 ## Session log
+
+### 2026-07-18 — Model Construct foundation
+
+- **Goal:** заложить гибкость, настраиваемость, масштаб, автоподстройку к железу.
+- **Done:** `docs/CONSTRUCT.md`, `construct/example.toml`, NL-ADR-006; updates ARCHITECTURE/SCALE/INTEGRATION/AGENTS.
+- **Idea:** эволюция = слоты в манифесте + profiles (lite→dc), не одна жёсткая сеть; autotune = выбор профиля по RAM, lock after boot.
+- **Next:** LoRA data prep; optional construct validate script (S1).
 
 ### 2026-07-18 — Agent documentation + architecture pack
 

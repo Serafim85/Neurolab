@@ -17,10 +17,10 @@
 
 **Порядок:** eval → Tiny LoRA → extract → router. Mid/Large — по `SCALE-PLAN.md`.
 
-## Dense first
+## Dense first + Construct
 
-Каждая мини-сеть — плотная. «MoE» — на уровне продукта (`MICRO-MOE.md`).
-
+Каждая мини-сеть — плотная. «MoE» — на уровне продукта (`MICRO-MOE.md`).  
+Эволюция и железо — через **Model Construct** (`CONSTRUCT.md`): слоты in/out, profiles, лёгкий autotune.
 ## Success metrics
 
 - GGUF в Outpost + CARD (LICENSE, SHA)

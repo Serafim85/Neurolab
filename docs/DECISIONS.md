@@ -62,3 +62,25 @@
 **Decision:** Canonical set: `AGENTS.md`, `ARCHITECTURE`, `GOALS`, `INTEGRATION`, `SCALE-PLAN`, `ENGINEERING`, `DECISIONS`, `STATUS`.
 
 **Consequences:** Agents start at `AGENTS.md`; architecture changes update `ARCHITECTURE.md` + ADR.
+
+---
+
+## NL-ADR-006 — Model Construct: flexible slots + hardware profiles
+
+**Status:** Accepted (2026-07-18)
+
+**Context:** Future direction of “our neural net” is unknown (Tiny only vs suite vs Mid/Large). Need foundations for flexibility, configurability, scale, and light auto-fit to hardware — without freezing a single monolith or building magic NAS.
+
+**Decision:**
+
+1. Evolve models as a **Model Construct**: declarative catalog of **slots** (micro-nets), **router**, **hardware profiles**, **autotune policy** — see `docs/CONSTRUCT.md`, `construct/example.toml` (schema v0.1).
+2. **Add/remove/configure** micro-nets = edit catalog + weights + CARD; API surface of Outpost stays stable.
+3. **Autotune v1** = select richest profile whose peak RAM fits `memory_limit_mb × safety_factor`; lock profile after boot; audit selection. No online retrain.
+4. Implementation order: Lab contract now (S0–S2) → Outpost Gate B+ load/autotune (S3–S5). Tiny LoRA is **not** blocked on full runtime construct.
+5. Align naming/fields with Commercial `agents.toml` / ModelPool where possible; construct is the **superset pack format**.
+
+**Consequences:**
+
+- Agents design new capabilities as **slots + skills**, not one-off forks.
+- Changing locked Tiny *base* still needs ADR; adding an `extract` slot does not.
+- Over-automation (continuous model swap mid-flight, auto LoRA) is out of scope until explicit ADR.

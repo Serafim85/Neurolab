@@ -1,0 +1,120 @@
+# Outpost Model Construct — EXAMPLE (Neurolab NL-ADR-006)
+# Schema v0.1 — declarative slots + router + hardware profiles.
+# Runtime load in Outpost = Gate B+; Lab uses this as the evolution contract.
+#
+# Docs: docs/CONSTRUCT.md
+
+schema_version = "0.1"
+construct_id = "outpost-default"
+construct_version = "0.1.0"
+
+[defaults]
+# Slot used when router fails or profile disables specialists.
+slot = "chat"
+# Profile: "auto" | "lite" | "standard" | "full" | "dc"
+profile = "auto"
+# Never exceed this many GGUFs resident (Outpost governor also applies).
+max_loaded = 2
+load_policy = "sequential" # sequential | warm | parallel
+
+# --- Catalog: add/remove micro-nets here ------------------------------------
+
+[[catalog]]
+id = "chat"
+enabled = true
+role = "chat"
+path = "artifacts/base/Qwen2.5-3B-Instruct-Q4_K_M.gguf"
+card = "models/outpost-tiny/CARD.md"
+skills = ["ru_chat", "code_short", "general"]
+ram_mb_q4 = 2800
+priority = 100
+# Higher priority survives when RAM is tight.
+
+[[catalog]]
+id = "extract"
+enabled = false # turn on when GGUF exists
+role = "extract"
+path = "artifacts/suite/outpost-extract-v0.Q4_K_M.gguf"
+card = "models/suite/extract/CARD.md"
+skills = ["json", "fields", "csv_hints"]
+ram_mb_q4 = 2800
+priority = 80
+
+[[catalog]]
+id = "summarize"
+enabled = false
+role = "summarize"
+path = "artifacts/suite/outpost-summarize-v0.Q4_K_M.gguf"
+card = "models/suite/summarize/CARD.md"
+skills = ["bullets", "ru_summary"]
+ram_mb_q4 = 2800
+priority = 60
+
+[[catalog]]
+id = "router"
+enabled = false
+role = "router"
+path = "artifacts/suite/outpost-router-v0.Q4_K_M.gguf"
+card = "models/suite/router/CARD.md"
+skills = ["route"]
+ram_mb_q4 = 1500
+priority = 40
+
+# --- Router -----------------------------------------------------------------
+
+[router]
+mode = "rules" # rules | pipeline | model | hybrid
+# When mode = "model", use catalog id:
+# model_slot = "router"
+
+[[router.rules]]
+skill = "json"
+match = ["json", "извлеки", "поля", "extract"]
+slot = "extract"
+
+[[router.rules]]
+skill = "bullets"
+match = ["маркер", "кратко", "саммари", "summary"]
+slot = "summarize"
+
+# --- Hardware profiles (autotune target) ------------------------------------
+# auto: pick the richest profile whose peak_ram_mb <= detected_budget * 0.85
+
+[[profiles]]
+id = "lite"
+label = "Branch / 8–16 GB"
+# Peak ≈ largest single slot under sequential load
+max_ram_mb = 12000
+slots = ["chat"]
+
+[[profiles]]
+id = "standard"
+label = "Department / 16–32 GB"
+max_ram_mb = 28000
+slots = ["chat", "extract"]
+
+[[profiles]]
+id = "full"
+label = "Server / 32–64 GB"
+max_ram_mb = 56000
+slots = ["chat", "extract", "summarize"]
+load_policy = "warm"
+
+[[profiles]]
+id = "dc"
+label = "Datacenter / 64 GB+ or GPU"
+max_ram_mb = 128000
+slots = ["chat", "extract", "summarize", "router"]
+load_policy = "warm"
+# Future: point chat path at Mid 7–14B without changing schema
+
+[autotune]
+enabled = true
+# Fraction of memory_limit_mb (or detected RAM) usable for models
+safety_factor = 0.85
+# Freeze profile after boot until reload (reliability)
+lock_after_boot = true
+
+[provenance]
+notes = "Example construct — replace paths after Tiny LoRA / suite builds"
+# sha256_manifest = "construct/SHA256SUMS"  # optional pack file

@@ -45,6 +45,8 @@ Commercial остаётся единственным местом пилотно
 | **`AGENTS.md`** | этот файл — ритуал и запреты |
 | **`STATUS.md`** | Done / In progress / Backlog / Session log |
 | **`docs/ARCHITECTURE.md`** | архитектура сети и системы Lab→Outpost |
+| **`docs/CONSTRUCT.md`** | гибкий конструкт слотов + профили железа (NL-ADR-006) |
+| **`construct/example.toml`** | schema манифеста микросетей |
 | **`docs/GOALS.md`** | цели, задачи, use-cases моделей |
 | **`docs/INTEGRATION.md`** | куда и как встраиваем в Outpost |
 | **`docs/SCALE-PLAN.md`** | план масштабирования Tiny→Mid→Large / suite |
@@ -94,10 +96,11 @@ Commercial остаётся единственным местом пилотно
 1. **Measure first** — baseline / eval до и после adapt.
 2. **One lever** — одна переменная за итерацию (данные *или* rank *или* base).
 3. **Dense first** — не arch-MoE на старте; micro-MoE = отдельные GGUF + router.
-4. **Ship as GGUF** — нет успеха без загрузки в Outpost.
-5. **Passport** — LICENSE, SHA, base, дата в CARD.
-6. **Min resource / max result** — предпочитать LoRA и 3B до full SFT и 14B.
-7. **Reliability & quality** — воспроизводимые скрипты, рубрика, не «кажется лучше».
+4. **Construct-first evolution** — новая способность = слот + skills/profile (`docs/CONSTRUCT.md`), не форк «одной сети».
+5. **Ship as GGUF** — нет успеха без загрузки в Outpost.
+6. **Passport** — LICENSE, SHA, base, дата в CARD.
+7. **Min resource / max result** — LoRA и 3B до 14B; profile `lite` на слабом железе.
+8. **Reliability & quality** — скрипты + rubric; autotune только с audit и lock after boot.
 
 ---
 
@@ -106,9 +109,9 @@ Commercial остаётся единственным местом пилотно
 | Сейчас | Не сейчас |
 |---|---|
 | Outpost-Tiny на базе Qwen2.5-3B; LoRA data / adapt | Mid 7–14B, Large, arch-MoE |
+| Construct schema v0.1 (манифест); runtime load — Gate B+ | Полный online auto-NAS / mid-request swap |
 | Eval harness + качество vs baseline 14/16 | Пять экспертов suite сразу |
 | Документация и инженерный контур Lab | Обучение на ПДн заказчика |
-
 ---
 
 ## 7. Граница с Commercial
