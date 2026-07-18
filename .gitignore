@@ -14,9 +14,14 @@ artifacts/base/**
 eval/results/raw/
 *.jsonl
 !eval/prompts.ru.jsonl
+!datasets/tiny-lora-v0/train.messages.jsonl
 datasets/**
 !datasets/.gitkeep
 !datasets/README.md
+!datasets/manifest-tiny-lora-v0.md
+!datasets/base-qwen25-3b.md
+!datasets/tiny-lora-v0/
+!datasets/tiny-lora-v0/**
 
 # Python / train
 .venv/

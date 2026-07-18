@@ -3,7 +3,8 @@
 | Field | Value |
 |---|---|
 | **ID** | `outpost-tiny-v0` |
-| **Status** | baseline **scored** 14/16 (87.5%) — not adapted yet |
+| **Status** | baseline 14/16 · **LoRA data ready** (`tiny-lora-v0`, 44 ex) — not trained yet |
+| **Train data** | `datasets/tiny-lora-v0/train.messages.jsonl` |
 | **Base GGUF SHA-256** | `d44e2c5d1ec3cae1d5cf6a744bee528e46c65a1e66e741fa92730967e7d625bb` |
 | **Role** | general RU/EN chat, 2nd slot, Workstation Lite |
 | **Architecture** | dense decoder-only (**not** MoE) |
@@ -12,7 +13,7 @@
 | **Base GGUF** | `Qwen2.5-3B-Instruct-Q4_K_M.gguf` |
 | **Base LICENSE** | Apache-2.0 ([Qwen2.5](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct)) |
 | **HF GGUF source** | `lmstudio-community/Qwen2.5-3B-Instruct-GGUF` (same as Outpost preset `qwen2.5-3b-instruct-q4`) |
-| **Adaptation** | none yet → later LoRA rank 8–16 or light SFT |
+| **Adaptation** | pending LoRA rank 8–16 on `tiny-lora-v0` |
 | **Context** | 4k–8k for train; runtime up to base limit |
 | **Export (after train)** | GGUF Q4_K_M |
 | **Runtime** | Commercial Outpost (`sovereignd`) BYOM |
@@ -37,6 +38,13 @@
 | Neurolab daemon cfg | `../../config/sovereign.baseline.toml` |
 | Eval prompts | `../../eval/prompts.ru.jsonl` |
 | Baseline results | `../../eval/results/baseline-qwen25-3b.md` |
+| LoRA data | `../../datasets/tiny-lora-v0/train.messages.jsonl` |
+
+## Train data (v0)
+
+- Manifest: `datasets/manifest-tiny-lora-v0.md`
+- Contour-safe + format (+ light general/json); no pilot ПДн
+- Regenerate: `python3 scripts/build_tiny_lora_data.py`
 
 ## Eval
 
