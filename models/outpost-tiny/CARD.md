@@ -63,10 +63,23 @@
 | Adapted GGUF SHA-256 | |
 | Trainer machine | |
 
+## Train / export
+
+See **`docs/TRAIN-TINY-LORA.md`**.
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements-train.txt
+python3 scripts/train_tiny_lora.py
+python3 scripts/merge_tiny_lora.py --adapter artifacts/runs/<stamp>/adapter
+# then llama.cpp convert + quantize → artifacts/outpost-tiny-v0.Q4_K_M.gguf
+```
+
 ## Smoke in Outpost
 
 ```bash
-# from neurolab — after GGUF exists
-./scripts/run_baseline.sh
-# or point Commercial sovereign.toml [models].path at the same GGUF
+# after GGUF exists — config/sovereign.tiny-v0.toml
+~/Projects/AI-Platform-Vision/target/release/sovereignd \
+  ~/Projects/neurolab/config/sovereign.tiny-v0.toml
+BASE_URL=http://127.0.0.1:8091 ./scripts/run_baseline.sh
 ```

@@ -26,6 +26,7 @@ datasets/**
 # Python / train
 .venv/
 venv/
+requirements-train.lock
 __pycache__/
 *.pyc
 .ipynb_checkpoints/

@@ -48,6 +48,7 @@ Commercial остаётся единственным местом пилотно
 | **`docs/CONSTRUCT.md`** | гибкий конструкт слотов + профили железа (NL-ADR-006) |
 | **`docs/INTELLECTUAL-CANON.md`** | интеллектуальный канон линейки (книги, papers, lab notes) |
 | **`docs/CONTOUR-EGRESS.md`** | контур / своё облако / публичный LLM default off |
+| **`docs/TRAIN-TINY-LORA.md`** | рецепт LoRA → GGUF |
 | **`construct/example.toml`** | schema манифеста микросетей |
 | **`docs/GOALS.md`** | цели, задачи, use-cases моделей |
 | **`docs/INTEGRATION.md`** | куда и как встраиваем в Outpost |

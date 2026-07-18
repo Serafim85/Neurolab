@@ -19,6 +19,7 @@ Commercial runtime: `~/Projects/AI-Platform-Vision`
 | [CONSTRUCT](docs/CONSTRUCT.md) | **гибкий конструкт** слотов + автоподстройка к железу |
 | [INTELLECTUAL-CANON](docs/INTELLECTUAL-CANON.md) | книги, статьи, Anthropic/OpenAI, векторы будущего |
 | [CONTOUR-EGRESS](docs/CONTOUR-EGRESS.md) | своё облако клиента · публичный LLM default off |
+| [TRAIN-TINY-LORA](docs/TRAIN-TINY-LORA.md) | LoRA → GGUF recipe |
 | [GOALS](docs/GOALS.md) | цели и задачи |
 | [INTEGRATION](docs/INTEGRATION.md) | встраивание в Outpost |
 | [SCALE-PLAN](docs/SCALE-PLAN.md) | масштабирование |
