@@ -41,3 +41,6 @@ checkpoints/
 .idea/
 .vscode/
 *.swp
+
+# stray screenshots
+screenshot*.png
