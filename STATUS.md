@@ -35,6 +35,7 @@
 3. Suite `extract` specialist v0 → enable slot in construct
 4. Construct pack layout (`packs/<id>/`)
 5. Commercial S3–S5: load construct + profile autotune (Gate B+)
+5b. **Construct Advisor** S6 (NL-ADR-008) — после S4; A1 rules first
 6. `summarize` specialist
 7. Embedding pack (align Commercial Phase 2)
 8. Private git remote for neurolab (human)
@@ -59,6 +60,13 @@
 ---
 
 ## Session log
+
+### 2026-07-18 — Construct Advisor (planned)
+
+- **Idea:** маленький оценщик: intent пользователя × железо → propose construct (слоты/profile); Accept человеком.
+- **ADR:** NL-ADR-008 · spec in `docs/CONSTRUCT.md` §7b · S6 after profiles work.
+- **v0:** rules + skills + RAM cap; не тяжёлый агент и не silent swap.
+- **Does not block:** Tiny LoRA.
 
 ### 2026-07-18 — Intellectual Canon
 

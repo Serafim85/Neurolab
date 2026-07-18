@@ -16,6 +16,7 @@
 | **Настраиваемость** | TOML/манифест: кого звать, лимиты, system, quant |
 | **Масштабируемость** | тот же контракт от 1×3B до N экспертов + Mid/Large |
 | **Автоподстройка** | профиль железа выбирает *какой* набор активировать |
+| **Advisor (план)** | маленький агент: желание пользователя × железо → рекомендуемый construct |
 
 Конструкт — это **контракт поставки и исполнения**, не новая ML-архитектура внутри одного файла весов.
 
@@ -23,18 +24,21 @@
 
 ## 2. One-liner
 
-**Construct = каталог слотов (микросетей) + маршрутизация + политики железа + паспорт.**  
+**Construct = каталог слотов + router + профили железа + паспорт (+ опционально Advisor).**  
 Добавил/убрал слот, сменил профиль RAM — поведение меняется; Outpost остаётся runtime.
 
 ```text
-construct.toml
+user intent + hardware ──► [Advisor] ──► proposed construct patch
+                                              │
+construct.toml � intent + hardware ──► [Advisor] ──► proposed construct patch
+                                              │
+construct.toml ◄─────────────────────────────┘
   ├── catalog[]     # слоты: id, path/gguf, role, ram_mb, skills
   ├── router        # rules | model | pipeline
   ├── profiles[]    # S / M / L железо → какие слоты on
   ├── policies      # load: sequential|warm|parallel; autotune
   └── provenance    # version, cards, sha
 ```
-
 ---
 
 ## 3. Принципы (заложить сразу)
@@ -153,6 +157,61 @@ detect: ram_mb, cpu_threads, gpu_vram_mb (если есть)
 
 ---
 
+## 7b. Construct Advisor — «оценщик» желания × железо
+
+> **Стоит ли задуматься? Да.** Это естественное развитие autotune: не только RAM→profile, а **задача пользователя → состав слотов**, в пределах железа.  
+> **Не делать первым:** сначала Tiny LoRA + S4 profile-by-RAM; Advisor = S6+.
+
+### Идея
+
+Маленький агент (rules → позже Tiny/extract-слот) на входе setup / «настроить под задачу»:
+
+```text
+Входы:
+  - intent: "аналитика CSV", "отказы в облако", "только чат на ноуте", …
+  - hardware: ram_mb, gpu_vram, cpu_threads (от governor / /health)
+  - catalog: какие GGUF вообще есть на диске + ram_mb_q4 + skills
+
+Выход (propose, не silent apply):
+  - profile id
+  - enabled slots[]
+  - default slot / router hints
+  - human-readable why + warnings ("14B не влезет, берём 3B + extract")
+```
+
+Оператор **Accept** → пишется patch в construct / `sovereign.toml`.  
+Отказ → ручная настройка как в §7.
+
+### Почему это хорошо для Outpost
+
+| Плюс | |
+|---|---|
+| Кастом под задачу | вертикаль без новой «нейросети с нуля» |
+| Min→max | догружает *ровно* то, что потянет железо |
+| Надёжность | propose + confirm; audit `construct.advisor_propose` |
+| GTM | «мастер настройки контура» для SI / филиала |
+| Совместимо с каноном | specialization + post-train skills, не magic NAS |
+
+### Риски (заложить сразу)
+
+| Риск | Правило |
+|---|---|
+| Advisor сам тяжёлый | v0 = **rules + таблица skills→slots**; LM только если rules miss |
+| Тихий swap mid-day | только setup / admin; `lock_after_boot` |
+| Overpromise | Advisor предлагает из **уже скачанных** GGUF; download — отдельный шаг human |
+| Галлюцинация «нужен 70B» | жёсткий cap: `ram_mb_q4` vs budget; никогда выше профиля |
+
+### Фазы Advisor
+
+| Фаза | Поведение |
+|---|---|
+| **A0** | Чеклист в UI/docs: «задача → какой profile» (без кода) |
+| **A1** | Rules engine: intent keywords → slot set ∩ hardware filter |
+| **A2** | Tiny/advisor-слот генерит JSON proposal по schema; validate script |
+| **A3** | Optional: предложить `sovereign model pull` preset, если слота нет на диске |
+
+---
+
 ## 8. Риски и пределы гибкости
 
 | Риск | Правило |
@@ -174,8 +233,9 @@ detect: ram_mb, cpu_threads, gpu_vram_mb (если есть)
 | **S3** | Commercial | load construct catalog (Gate B align) |
 | **S4** | Commercial | profile auto from `memory_limit_mb` |
 | **S5** | Commercial | audit + ops UI «active construct» |
+| **S6** | Commercial + Lab | **Construct Advisor** A1→A2 (intent × hardware → propose) |
 
-Не блокировать Tiny LoRA ожиданием S3–S5.
+Не блокировать Tiny LoRA ожиданием S3–S6. Advisor не стартует до рабочего catalog+profiles (S3–S4).
 
 ---
 
