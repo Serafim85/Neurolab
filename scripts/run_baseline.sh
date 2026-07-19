@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # Run eval/prompts.ru.jsonl against a local Outpost daemon.
-# Prereq: GGUF at artifacts/base/… and sovereignd listening (default :8090).
+# Prereq: sovereignd listening (default :8090).
+#
+# Optional:
+#   BASE_URL=http://127.0.0.1:8091
+#   GGUF=/path/to/active.gguf   # for meta SHA (defaults to base Qwen 3B)
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -9,17 +13,10 @@ BASE_URL="${BASE_URL:-http://127.0.0.1:8090}"
 PROMPTS="$ROOT/eval/prompts.ru.jsonl"
 STAMP="$(date +%Y%m%d-%H%M%S)"
 OUT_DIR="$ROOT/eval/results/raw/baseline-$STAMP"
-GGUF="$ROOT/artifacts/base/Qwen2.5-3B-Instruct-Q4_K_M.gguf"
+GGUF="${GGUF:-$ROOT/artifacts/base/Qwen2.5-3B-Instruct-Q4_K_M.gguf}"
 MAX_TOKENS="${MAX_TOKENS:-256}"
 
 mkdir -p "$OUT_DIR" "$ROOT/artifacts/base"
-
-if [[ ! -f "$GGUF" ]]; then
-  echo "Missing base GGUF: $GGUF"
-  echo "Pull first:"
-  echo "  $COMMERCIAL/target/release/sovereign model pull qwen2.5-3b-instruct-q4 --dir $ROOT/artifacts/base"
-  exit 1
-fi
 
 if ! curl -sf -m 2 "$BASE_URL/health" >/dev/null; then
   echo "No daemon at $BASE_URL/health"
@@ -28,13 +25,21 @@ if ! curl -sf -m 2 "$BASE_URL/health" >/dev/null; then
   if [[ ! -x "$SOV" ]]; then
     SOV="$COMMERCIAL/target/debug/sovereignd"
   fi
-  echo "  cd $ROOT && $SOV $ROOT/config/sovereign.baseline.toml"
+  echo "  $SOV $ROOT/config/sovereign.baseline.toml"
+  echo "  # or: $SOV $ROOT/config/sovereign.tiny-v0.toml  → BASE_URL=http://127.0.0.1:8091"
   exit 1
 fi
 
-echo "Baseline → $OUT_DIR (daemon $BASE_URL)"
-echo "gguf=$(basename "$GGUF")" | tee "$OUT_DIR/meta.txt"
-shasum -a 256 "$GGUF" | tee -a "$OUT_DIR/meta.txt"
+echo "Eval → $OUT_DIR (daemon $BASE_URL)"
+{
+  echo "gguf_path=$GGUF"
+  if [[ -f "$GGUF" ]]; then
+    echo "gguf=$(basename "$GGUF")"
+    shasum -a 256 "$GGUF"
+  else
+    echo "gguf=MISSING (set GGUF= to active weights for SHA)"
+  fi
+} | tee "$OUT_DIR/meta.txt"
 curl -sf "$BASE_URL/health" | tee "$OUT_DIR/health.json"
 echo
 
@@ -67,5 +72,7 @@ print(p["choices"][0]["message"]["content"])
   echo
 done < "$PROMPTS"
 
-echo "Done. Score with eval/RUBRIC.md → eval/results/baseline-qwen25-3b.md"
+echo "Done. Score with eval/RUBRIC.md → eval/results/"
 echo "Raw: $OUT_DIR"
+echo "Tiny-v0 example:"
+echo "  GGUF=$ROOT/artifacts/outpost-tiny-v0.Q4_K_M.gguf BASE_URL=http://127.0.0.1:8091 $0"

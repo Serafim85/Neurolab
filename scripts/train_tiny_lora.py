@@ -56,6 +56,12 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="QLoRA (CUDA + bitsandbytes only; ignore on Mac)",
     )
+    p.add_argument(
+        "--resume",
+        type=Path,
+        default=None,
+        help="Resume from trainer checkpoint dir",
+    )
     return p.parse_args()
 
 
@@ -169,10 +175,11 @@ def main() -> int:
 
     if device == "cpu":
         torch_dtype = torch.float32
+    # mps: keep float16 to fit 3B in unified memory
 
     model_kwargs: dict = {
         "trust_remote_code": True,
-        "torch_dtype": torch_dtype if quant is None else None,
+        "dtype": torch_dtype if quant is None else None,
     }
     if quant is not None:
         model_kwargs["quantization_config"] = quant
@@ -184,6 +191,11 @@ def main() -> int:
     model = AutoModelForCausalLM.from_pretrained(args.base, **model_kwargs)
     if quant is None and device in ("mps", "cpu"):
         model = model.to(device)
+
+    if hasattr(model, "gradient_checkpointing_enable"):
+        model.gradient_checkpointing_enable()
+        if hasattr(model, "enable_input_require_grads"):
+            model.enable_input_require_grads()
 
     # Qwen2 target modules
     lora = LoraConfig(
@@ -220,12 +232,18 @@ def main() -> int:
         gradient_accumulation_steps=args.grad_accum,
         learning_rate=args.lr,
         logging_steps=1,
-        save_strategy="epoch",
+        save_strategy="steps",
+        save_steps=2,
+        save_total_limit=3,
         bf16=False,
         fp16=(device == "cuda" and quant is None),
         max_length=args.max_seq_len,
         report_to=[],
         seed=42,
+        dataloader_pin_memory=False,
+        dataloader_num_workers=0,
+        gradient_checkpointing=True,
+        optim="adamw_torch",
     )
     # Older trl used max_seq_length
     try:
@@ -259,8 +277,14 @@ def main() -> int:
 
     # Avoid tokenizer parallelism warning noise
     os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+    if device == "mps":
+        os.environ.setdefault("PYTORCH_MPS_HIGH_WATERMARK_RATIO", "0.0")
 
-    trainer.train()
+    if args.resume is not None:
+        print(f"resume={args.resume}")
+        trainer.train(resume_from_checkpoint=str(args.resume))
+    else:
+        trainer.train()
     adapter_dir.mkdir(parents=True, exist_ok=True)
     trainer.model.save_pretrained(adapter_dir)
     tokenizer.save_pretrained(adapter_dir)
