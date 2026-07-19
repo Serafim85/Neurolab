@@ -1,16 +1,16 @@
 # tiny-lora-v1 stats
 
-Total examples: **78**
+Total examples: **74**
 
 | tag | count |
 |---|---|
-| `contour_allow_client` | 10 |
-| `contour_clarify` | 14 |
+| `contour_allow_client` | 9 |
+| `contour_clarify` | 13 |
 | `contour_refuse_public` | 10 |
 | `format_bullets` | 7 |
-| `format_sentences` | 15 |
+| `format_sentences` | 14 |
 | `format_short` | 3 |
-| `general_ru` | 13 |
+| `general_ru` | 12 |
 | `json_code` | 6 |
 
 ## v1 extras focus

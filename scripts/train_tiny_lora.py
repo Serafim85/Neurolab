@@ -62,7 +62,25 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Resume from trainer checkpoint dir",
     )
+    p.add_argument(
+        "--dtype",
+        choices=("auto", "float16", "float32"),
+        default="auto",
+        help="auto: float32 on cpu, float16 on mps/cuda (use float32 on MPS if NaNs)",
+    )
+    p.add_argument("--max-grad-norm", type=float, default=0.5)
     return p.parse_args()
+
+
+def adapter_has_nan(adapter_dir: Path) -> bool:
+    from safetensors import safe_open
+
+    for f in adapter_dir.glob("*.safetensors"):
+        with safe_open(f, framework="pt") as s:
+            for key in s.keys():
+                if bool(s.get_tensor(key).isnan().any()):
+                    return True
+    return False
 
 
 def pick_device(name: str) -> str:
@@ -176,9 +194,13 @@ def main() -> int:
                 bnb_4bit_quant_type="nf4",
             )
 
-    if device == "cpu":
+    if args.dtype == "float32" or device == "cpu":
         torch_dtype = torch.float32
-    # mps: keep float16 to fit 3B in unified memory
+    elif args.dtype == "float16":
+        torch_dtype = torch.float16
+    else:
+        # auto: float16 on mps/cuda to fit 3B; override with --dtype float32 if NaNs
+        torch_dtype = torch.float16
 
     model_kwargs: dict = {
         "trust_remote_code": True,
@@ -236,10 +258,11 @@ def main() -> int:
         learning_rate=args.lr,
         logging_steps=1,
         save_strategy="steps",
-        save_steps=2,
-        save_total_limit=3,
+        save_steps=1,
+        save_total_limit=12,
         bf16=False,
         fp16=(device == "cuda" and quant is None),
+        max_grad_norm=args.max_grad_norm,
         max_length=args.max_seq_len,
         report_to=[],
         seed=42,
@@ -291,6 +314,13 @@ def main() -> int:
     adapter_dir.mkdir(parents=True, exist_ok=True)
     trainer.model.save_pretrained(adapter_dir)
     tokenizer.save_pretrained(adapter_dir)
+    if adapter_has_nan(adapter_dir):
+        print(
+            f"ERROR: adapter contains NaN weights → {adapter_dir}\n"
+            "  Retry with: --dtype float32 --lr 1e-4 --max-grad-norm 0.3",
+            file=sys.stderr,
+        )
+        return 3
     write_notes(run_dir, args, device, len(rows))
 
     print(f"OK adapter → {adapter_dir}")

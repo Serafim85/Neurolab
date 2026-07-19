@@ -512,11 +512,26 @@ def build_v1_extras() -> list[dict]:
     return rows
 
 
+def dedupe_by_user(rows: list[dict], *, prefer_later: bool = True) -> list[dict]:
+    """Keep one example per user text (v1 extras override v0 on conflicts)."""
+    by_user: dict[str, dict] = {}
+    order: list[str] = []
+    for row in rows:
+        user = row["messages"][0]["content"]
+        if user not in by_user:
+            order.append(user)
+        elif not prefer_later:
+            continue
+        by_user[user] = row
+    return [by_user[u] for u in order]
+
+
 def build(version: str) -> list[dict]:
     if version == "v0":
         return build_v0()
     if version == "v1":
-        return build_v0() + build_v1_extras()
+        # Extras must win on shared prompts (e.g. contour_clarify eval twin).
+        return dedupe_by_user(build_v0() + build_v1_extras(), prefer_later=True)
     raise ValueError(f"unknown version: {version}")
 
 

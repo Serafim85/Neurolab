@@ -4,7 +4,7 @@
 |---|---|
 | **ID** | `tiny-lora-v1` |
 | **Purpose** | Close Tiny-v0 eval gaps: clarify, formal×2, richer airgap |
-| **Base** | `tiny-lora-v0` (44) **+** v1 extras |
+| **Base** | `tiny-lora-v0` + v1 extras · **deduped by user** (extras win) → **74** |
 | **Policy** | `docs/CONTOUR-EGRESS.md` · NL-ADR-009 |
 | **Base model** | Qwen2.5-3B-Instruct |
 | **PII** | none — synthetic only |

@@ -2,65 +2,55 @@
 
 | Field | Value |
 |---|---|
-| **ID** | `outpost-tiny-v0` |
-| **Status** | **lab GGUF ready** · eval 15/20 (75%) · shared 14/16 vs base |
-| **Train data** | `datasets/tiny-lora-v0/train.messages.jsonl` (44 ex) |
-| **Adapted GGUF** | `artifacts/outpost-tiny-v0.Q4_K_M.gguf` |
-| **Adapted GGUF SHA-256** | `405b4443e75856fdd0c3ff58a80cee11438bea7765fd6b2e338b490fd8ce27a7` |
-| **Base GGUF SHA-256** | `d44e2c5d1ec3cae1d5cf6a744bee528e46c65a1e66e741fa92730967e7d625bb` |
-| **Role** | general RU/EN chat, 2nd slot, Workstation Lite |
+| **ID (quality bar)** | `outpost-tiny-v0` |
+| **ID (experiment)** | `outpost-tiny-v1` |
+| **Status** | **v0 lab GGUF** eval **15/20** · **v1** GGUF ready but eval **12/20** (keep v0) |
 | **Architecture** | dense decoder-only (**not** MoE) |
-| **Target size** | ~3B params (v0) |
-| **Base (LOCKED)** | **Qwen2.5-3B-Instruct** |
-| **Base LICENSE** | Apache-2.0 ([Qwen2.5](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct)) |
-| **Adaptation** | LoRA r=16 α=32 · 1 epoch · MPS · `tiny-lora-v0` |
-| **Context** | train max 512; runtime config 4096 |
-| **Export** | GGUF Q4_K_M |
-| **Runtime** | Commercial Outpost (`sovereignd`) BYOM |
+| **Base (LOCKED)** | **Qwen2.5-3B-Instruct** · Apache-2.0 |
+| **Role** | general RU/EN chat, 2nd slot, Workstation Lite |
 
-## Local paths (this machine)
+## Artifacts (this machine)
 
-| Artifact | Path |
-|---|---|
-| Base GGUF | `artifacts/base/Qwen2.5-3B-Instruct-Q4_K_M.gguf` |
-| LoRA adapter | `artifacts/runs/20260719-mps-e1/adapter` |
-| Merged HF | `artifacts/hf/outpost-tiny-v0` |
-| Adapted GGUF | `artifacts/outpost-tiny-v0.Q4_K_M.gguf` |
-| Smoke config | `config/sovereign.tiny-v0.toml` (:8091) |
-| Eval sheet | `eval/results/tiny-v0-vs-baseline.md` |
-
-## Train data (v0)
-
-- Manifest: `datasets/manifest-tiny-lora-v0.md`
-- Contour-safe + format (+ light general/json); no pilot ПДн
-- Regenerate: `python3 scripts/build_tiny_lora_data.py`
-
-## Provenance
-
-| | |
-|---|---|
-| Base | `Qwen/Qwen2.5-3B-Instruct` (HF cache on trainer machine) |
-| Train date | 2026-07-19 |
-| Train run | `artifacts/runs/20260719-mps-e1` · NOTES.md · train_loss≈2.53 |
-| LoRA | r=16, alpha=32, dropout=0.05, epochs=1, lr=2e-4, max_seq=512, grad_accum=4 |
-| Trainer machine | Apple M1 Pro · MPS · Python 3.12 |
-| Adapted GGUF SHA-256 | `405b4443e75856fdd0c3ff58a80cee11438bea7765fd6b2e338b490fd8ce27a7` |
+| Artifact | Path | SHA-256 (prefix) |
+|---|---|---|
+| Base GGUF | `artifacts/base/Qwen2.5-3B-Instruct-Q4_K_M.gguf` | `d44e2c5d…` |
+| **Tiny-v0 GGUF** | `artifacts/outpost-tiny-v0.Q4_K_M.gguf` | `405b4443…ce27a7` |
+| Tiny-v1 GGUF | `artifacts/outpost-tiny-v1.Q4_K_M.gguf` | `1de15252…d55430` |
+| v0 adapter | `artifacts/runs/20260719-mps-e1/adapter` | |
+| v1 adapter | `artifacts/runs/20260719-mps-v1-e1/adapter` | |
 
 ## Eval
 
-| Set | Score |
-|---|---|
-| Base (pre-LoRA, 8 prompts) | 14/16 |
-| Tiny-v0 shared 8 | 14/16 (refuse↑, airgap↓) |
-| Tiny-v0 full 10 | **15/20 (75%)** |
+| Model | Full 10 | Notes |
+|---|---|---|
+| Base Qwen 3B | 14/16 (8-prompt) | |
+| Tiny-v0 | **15/20** | refuse↑ |
+| Tiny-v1 e2 | **12/20** | short answers; clarify still wrong |
 
-Data for those gaps: `datasets/tiny-lora-v1/` (78) — not yet trained as GGUF.
+Sheets: `eval/results/tiny-v0-vs-baseline.md` · `eval/results/tiny-v1-vs-baseline.md`
+
+## Data
+
+| Set | Path | Notes |
+|---|---|---|
+| v0 | `datasets/tiny-lora-v0/` | 44 |
+| v1 | `datasets/tiny-lora-v1/` | **74** after user-prompt dedupe (extras win) |
+
+## Train (v1 lesson)
+
+- MPS float16 + lr=2e-4 → **NaN adapter** (discard)
+- Stable: `--lr 8e-5 --max-grad-norm 0.3` · then epoch 2
+- Conflicting duplicate prompts in v0+v1 hurt clarify — builder now dedupes
+- Next: retrain v1.1 on deduped 74 @ lr≈1.2e-4
 
 ## Smoke
 
 ```bash
+# quality bar
 ~/Projects/AI-Platform-Vision/target/release/sovereignd \
-  ~/Projects/neurolab/config/sovereign.tiny-v0.toml
-GGUF=$PWD/artifacts/outpost-tiny-v0.Q4_K_M.gguf \
-  BASE_URL=http://127.0.0.1:8091 ./scripts/run_baseline.sh
+  ~/Projects/neurolab/config/sovereign.tiny-v0.toml   # :8091
+
+# experiment
+~/Projects/AI-Platform-Vision/target/release/sovereignd \
+  ~/Projects/neurolab/config/sovereign.tiny-v1.toml   # :8092
 ```

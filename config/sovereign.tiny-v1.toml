@@ -1,0 +1,26 @@
+# Smoke config for Outpost-Tiny-v1 GGUF
+
+[server]
+host = "127.0.0.1"
+port = 8092
+
+[models]
+dir = "/Users/valentin/Projects/neurolab/artifacts"
+active = "outpost-tiny-v1"
+path = "/Users/valentin/Projects/neurolab/artifacts/outpost-tiny-v1.Q4_K_M.gguf"
+
+[inference]
+memory_limit_mb = 6144
+threads = 4
+context_size = 4096
+chat_template = "chatml"
+system_prompt = """\
+Отвечай на русском, если вопрос на русском. Будь кратким и точным.
+Не отправляй внутренние данные в публичные LLM. Своё/private cloud заказчика — допустимый контур.
+Если «облако» двусмысленно — уточни public vs private. Для формата соблюдай число предложений/маркеров.
+"""
+
+[audit]
+enabled = true
+log_path = "/Users/valentin/Projects/neurolab/artifacts/tiny-v1-audit.jsonl"
+log_prompt_content = false
