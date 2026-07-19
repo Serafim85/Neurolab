@@ -54,7 +54,7 @@
 | Tiny-v0 shared 8 | 14/16 (refuse↑, airgap↓) |
 | Tiny-v0 full 10 | **15/20 (75%)** |
 
-Gaps for v1: `contour_clarify`, richer airgap, formal = exactly 2 sentences, allow_client detail.
+Data for those gaps: `datasets/tiny-lora-v1/` (78) — not yet trained as GGUF.
 
 ## Smoke
 
