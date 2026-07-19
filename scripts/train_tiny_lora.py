@@ -29,7 +29,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--data",
         type=Path,
-        default=ROOT / "datasets" / "tiny-lora-v1" / "train.messages.jsonl",
+        default=ROOT / "datasets" / "tiny-lora-v1.2" / "train.messages.jsonl",
     )
     p.add_argument(
         "--base",

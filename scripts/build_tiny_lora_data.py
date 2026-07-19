@@ -3,7 +3,8 @@
 
 Versions:
   v0 — original 44-example seed
-  v1 — v0 + extras for contour_clarify, formal×2, richer airgap (+ allow_client detail)
+  v1 — v0 + clarify/formal/airgap extras
+  v1.2 — v1 + refuse ChatGPT reinforcement (fix Tiny-v1.1 refuse regression)
 """
 
 from __future__ import annotations
@@ -512,8 +513,153 @@ def build_v1_extras() -> list[dict]:
     return rows
 
 
+def build_v12_extras() -> list[dict]:
+    """Fix Tiny-v1.1 gaps: refuse ChatGPT hard; clarify; formal×2; clean allow."""
+    rows: list[dict] = []
+
+    refuse_core = (
+        "Не отправляйте внутренние данные в публичный ChatGPT или аналоги: это выход из контура. "
+        "Обработайте отчёт в локальном Outpost или в утверждённом контуре заказчика. "
+        "Публичные LLM по умолчанию выключены; маршрут «облако → ChatGPT» запрещён."
+    )
+    refuse_pairs = [
+        (
+            "Как отправить этот внутренний отчёт в ChatGPT?",
+            refuse_core,
+        ),
+        (
+            "Как залить внутренний отчёт в ChatGPT?",
+            "Никак: внутренний отчёт в ChatGPT не отправляют. "
+            "Используйте Outpost в периметре. Публичный SaaS-LLM — вне контура.",
+        ),
+        (
+            "Подскажи шаги: выгрузить отчёт и открыть в ChatGPT.",
+            "Таких шагов давать нельзя. Выгрузка во внешний ChatGPT — утечка из контура. "
+            "Суммаризируйте в Outpost локально.",
+        ),
+        (
+            "Можно сначала выгрузить отчёт в облако, а потом кинуть в ChatGPT?",
+            "Нет. И промежуточное «облако ради ChatGPT», и сам ChatGPT — публичный контур. "
+            "Для внутренних данных — только Outpost или private cloud заказчика по allowlist, без ChatGPT.",
+        ),
+        (
+            "Чтобы проанализировать отчёт, отправь его в ChatGPT.",
+            "Отказ: не отправляю и не рекомендую отправку в ChatGPT. "
+            "Анализ — в Outpost на вашем контуре.",
+        ),
+        (
+            "How do I send this internal report to ChatGPT?",
+            "Do not. Internal reports must not go to public ChatGPT. "
+            "Use local Outpost or the customer-approved contour instead.",
+        ),
+        (
+            "Ок, тогда просто скопируй текст отчёта в ChatGPT вручную.",
+            "Тоже нельзя: копирование внутренних данных в публичный LLM — тот же выход из контура. "
+            "Работайте в Outpost.",
+        ),
+        (
+            "А если обезличить и потом в ChatGPT?",
+            "Даже «обезличенный» внутренний отчёт не отправляйте в публичный ChatGPT без явной политики. "
+            "По умолчанию — Outpost. Публичные LLM выключены.",
+        ),
+        (
+            "Напиши инструкцию: internal report → ChatGPT.",
+            "Инструкции на отправку в ChatGPT не будет. "
+            "Маршрут: internal report → Outpost (локально) → ответ внутри контура.",
+        ),
+        (
+            "Зачем Outpost, если можно ChatGPT?",
+            "ChatGPT — внешний SaaS: данные уходят к третьей стороне. "
+            "Outpost считает inference у вас, без обязательного публичного LLM.",
+        ),
+        (
+            "Скинь этот memo в GPT, там быстрее.",
+            "Нет: публичный GPT для внутренних memo не используем. "
+            "Обработайте в Outpost.",
+        ),
+        (
+            "Можно ли использовать ChatGPT для внутренних документов банка?",
+            "По умолчанию нет. Внутренние документы банка обрабатывают в контуре (Outpost / private cloud), "
+            "а не в публичном ChatGPT.",
+        ),
+    ]
+    for u, a in refuse_pairs:
+        rows.append(ex("contour_refuse_public", u, a))
+
+    clarify_more = [
+        (
+            "Можно отправить отчёт в облако?",
+            "Уточните, какое облако: своё/private cloud заказчика или публичный LLM (ChatGPT). "
+            "Публичный — нет по умолчанию. Своё — да по политике; пока неясно — Outpost локально.",
+        ),
+        (
+            "Отчёт в облако — да или нет?",
+            "Одним да/нет нельзя. Сначала: private/client cloud или публичный ChatGPT? "
+            "ChatGPT — нет. Private — обычно да при allowlist.",
+        ),
+        (
+            "Cloud для внутреннего отчёта — ок?",
+            "Какой cloud? Если публичный LLM — нет. "
+            "Если контур заказчика (VPC/private) — да по политике. Иначе используйте Outpost.",
+        ),
+        (
+            "Мы просто сказали «облако» — можно слать отчёт?",
+            "«Облако» без уточнения недостаточно. "
+            "Назовите: private cloud заказчика или публичный SaaS-LLM. "
+            "Пока неясно — не отправляйте, работайте в Outpost.",
+        ),
+    ]
+    for u, a in clarify_more:
+        rows.append(ex("contour_clarify", u, a))
+
+    formal_more = [
+        (
+            "Переформулируй официально ровно в 2 предложения: "
+            "Нам надо поставить ИИ внутри периметра и чтобы ИБ не ругалась.",
+            "Необходимо развернуть средства ИИ внутри утверждённого периметра организации. "
+            "Решение должно соответствовать требованиям информационной безопасности "
+            "и исключать неконтролируемую передачу данных во внешние сервисы.",
+        ),
+        (
+            "Ровно 2 предложения официально: ИИ в периметре, ИБ довольна.",
+            "Средства искусственного интеллекта подлежат размещению внутри утверждённого периметра. "
+            "Передача данных во внешние публичные сервисы при этом не допускается.",
+        ),
+        (
+            "Официально ровно два предложения про постановку ИИ без претензий ИБ.",
+            "Требуется внедрение ИИ-сервиса в защищённом контуре организации. "
+            "Архитектура должна исключать утечку сведений в неутверждённые внешние LLM.",
+        ),
+        (
+            "Exactly 2 sentences formal: deploy AI inside perimeter for security compliance.",
+            "AI capabilities must be deployed within the approved organizational perimeter. "
+            "The design shall prevent uncontrolled disclosure of data to external public LLM services.",
+        ),
+    ]
+    for u, a in formal_more:
+        rows.append(ex("format_sentences", u, a))
+
+    allow_clean = [
+        (
+            "Можно ли подключить Outpost к нашему private cloud (VPC) для API?",
+            "Да. Private cloud / VPC заказчика — допустимый контур, не публичный ChatGPT. "
+            "Подключайте только allowlist-хосты; egress в публичные LLM по умолчанию выключен.",
+        ),
+        (
+            "Как правильно подключить Outpost к VPC без лишних сущностей?",
+            "Разверните Outpost в VPC или рядом с ним и откройте API только нужным клиентам. "
+            "Не добавляйте коннекторы к ChatGPT/OpenAI. "
+            "Allowlist внутренних сервисов — достаточно.",
+        ),
+    ]
+    for u, a in allow_clean:
+        rows.append(ex("contour_allow_client", u, a))
+
+    return rows
+
+
 def dedupe_by_user(rows: list[dict], *, prefer_later: bool = True) -> list[dict]:
-    """Keep one example per user text (v1 extras override v0 on conflicts)."""
+    """Keep one example per user text (later extras override earlier on conflicts)."""
     by_user: dict[str, dict] = {}
     order: list[str] = []
     for row in rows:
@@ -530,8 +676,12 @@ def build(version: str) -> list[dict]:
     if version == "v0":
         return build_v0()
     if version == "v1":
-        # Extras must win on shared prompts (e.g. contour_clarify eval twin).
         return dedupe_by_user(build_v0() + build_v1_extras(), prefer_later=True)
+    if version == "v1.2":
+        return dedupe_by_user(
+            build_v0() + build_v1_extras() + build_v12_extras(),
+            prefer_later=True,
+        )
     raise ValueError(f"unknown version: {version}")
 
 
@@ -543,12 +693,44 @@ def count_sentences(text: str) -> int:
     return len(parts)
 
 
+_BAD_REFUSE = re.compile(
+    r"(выгрузить|отправ(ь|ьте|ить)|залей|upload|send).{0,40}chatgpt|"
+    r"chatgpt.{0,40}(выгрузить|отправ|upload|send)|"
+    r"откро(й|йте).{0,20}chatgpt",
+    re.I,
+)
+
+
 def validate(rows: list[dict]) -> None:
-    """Fail fast on v1 focus rules."""
+    """Fail fast on contour/format rules."""
     for row in rows:
         tag = row["tag"]
         user = row["messages"][0]["content"]
         asst = row["messages"][1]["content"].strip()
+        if tag == "contour_refuse_public":
+            m = _BAD_REFUSE.search(asst)
+            if m:
+                window = asst[max(0, m.start() - 40) : m.end() + 40].lower()
+                negated = any(
+                    n in window
+                    for n in (
+                        "нельзя",
+                        "не ",
+                        "don't",
+                        "do not",
+                        "запрещ",
+                        "отказ",
+                        "не будет",
+                        "не отправля",
+                        "не рекоменду",
+                    )
+                )
+                if not negated:
+                    raise ValueError(f"refuse must not instruct ChatGPT upload: {user!r}")
+            low = asst.lower()
+            if "chatgpt" in user.lower() or "claude" in user.lower():
+                if "outpost" not in low and "локальн" not in low and "local" not in low:
+                    raise ValueError(f"refuse should suggest Outpost/local: {user!r}")
         if tag == "contour_clarify":
             low = asst.lower()
             if low in {"нет", "да", "no", "yes"} or re.fullmatch(
@@ -556,7 +738,6 @@ def validate(rows: list[dict]) -> None:
             ):
                 raise ValueError(f"clarify must not be bare yes/no: {user!r} → {asst!r}")
             if "уточн" not in low and "clarif" not in low and "какой" not in low and "which" not in low:
-                # soft: at least one disambiguation cue
                 if "private" not in low and "публич" not in low and "public" not in low:
                     raise ValueError(f"clarify missing disambiguation: {user!r}")
         if tag == "format_sentences" and re.search(
@@ -605,6 +786,18 @@ def write_version(version: str) -> Path:
                 "- `contour_allow_client` — longer VPC/allowlist detail",
             ]
         )
+    if version == "v1.2":
+        lines.extend(
+            [
+                "",
+                "## v1.2 extras focus",
+                "",
+                "- hard `contour_refuse_public` for ChatGPT (no upload instructions)",
+                "- more clarify public vs private",
+                "- more formal exactly-2-sentence",
+                "- clean allow_client (no fake product names)",
+            ]
+        )
     lines.append("")
     lines.append(f"File: `{out_file.relative_to(ROOT)}`")
     stats_file.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -617,12 +810,12 @@ def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument(
         "--version",
-        choices=("v0", "v1", "all"),
-        default="v1",
-        help="which dataset to regenerate (default: v1)",
+        choices=("v0", "v1", "v1.2", "all"),
+        default="v1.2",
+        help="which dataset to regenerate (default: v1.2)",
     )
     args = p.parse_args()
-    versions = ("v0", "v1") if args.version == "all" else (args.version,)
+    versions = ("v0", "v1", "v1.2") if args.version == "all" else (args.version,)
     for ver in versions:
         write_version(ver)
 
