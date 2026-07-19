@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Train LoRA adapter for Outpost-Tiny on tiny-lora-v0 (messages JSONL).
+Train LoRA adapter for Outpost-Tiny on messages JSONL (tiny-lora-v0 / v1).
 
 Example:
   python3 -m venv .venv && source .venv/bin/activate
@@ -29,7 +29,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--data",
         type=Path,
-        default=ROOT / "datasets" / "tiny-lora-v0" / "train.messages.jsonl",
+        default=ROOT / "datasets" / "tiny-lora-v1" / "train.messages.jsonl",
     )
     p.add_argument(
         "--base",
@@ -137,7 +137,10 @@ def main() -> int:
     args = parse_args()
     if not args.data.is_file():
         print(f"ERROR: data not found: {args.data}", file=sys.stderr)
-        print("Run: python3 scripts/build_tiny_lora_data.py", file=sys.stderr)
+        print(
+            "Run: python3 scripts/build_tiny_lora_data.py --version v1",
+            file=sys.stderr,
+        )
         return 1
 
     # Late imports so --help works without torch installed

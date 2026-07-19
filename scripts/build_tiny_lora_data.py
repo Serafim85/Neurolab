@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
-"""Build synthetic Tiny LoRA v0 dataset (contour-safe + format). Regeneratable, no PII."""
+"""Build synthetic Tiny LoRA datasets (contour-safe + format). Regeneratable, no PII.
+
+Versions:
+  v0 — original 44-example seed
+  v1 — v0 + extras for contour_clarify, formal×2, richer airgap (+ allow_client detail)
+"""
 
 from __future__ import annotations
 
+import argparse
 import json
+import re
 from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT_DIR = ROOT / "datasets" / "tiny-lora-v0"
-OUT_FILE = OUT_DIR / "train.messages.jsonl"
-STATS_FILE = OUT_DIR / "STATS.md"
 
 
 def ex(tag: str, user: str, assistant: str) -> dict:
@@ -23,7 +27,7 @@ def ex(tag: str, user: str, assistant: str) -> dict:
     }
 
 
-def build() -> list[dict]:
+def build_v0() -> list[dict]:
     rows: list[dict] = []
 
     refuse_assistant = (
@@ -269,16 +273,303 @@ def build() -> list[dict]:
     return rows
 
 
-def main() -> None:
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
-    rows = build()
-    with OUT_FILE.open("w", encoding="utf-8") as f:
+def build_v1_extras() -> list[dict]:
+    """Close Tiny-v0 eval gaps: clarify≠yes/no, formal=2 sentences, richer airgap."""
+    rows: list[dict] = []
+
+    clarify_pairs = [
+        (
+            "Можно отправить отчёт в облако?",
+            "Нельзя ответить да/нет без уточнения. "
+            "Если «облако» = своё/private cloud заказчика — обычно да по allowlist. "
+            "Если публичный LLM (ChatGPT и т.п.) — по умолчанию нет; используйте Outpost.",
+        ),
+        (
+            "Отправь в облако, пожалуйста.",
+            "Уточните контур: корпоративное/private cloud или публичный SaaS-LLM. "
+            "Публичный — отказ для внутренних данных. "
+            "Пока неясно — обрабатывайте локально в Outpost.",
+        ),
+        (
+            "Можно в cloud?",
+            "Какой cloud? Свой контур заказчика — да при политике и allowlist. "
+            "Публичный ChatGPT/Claude/Gemini — нет по умолчанию.",
+        ),
+        (
+            "Залей документ в облако для анализа.",
+            "Сначала уточните: private cloud / VPC компании или публичный LLM. "
+            "Для публичного LLM — не загружайте. "
+            "Для утверждённого контура — можно; иначе используйте локальный Outpost.",
+        ),
+        (
+            "А облако нормально для этого файла?",
+            "Зависит от типа облака. "
+            "Своё/частное облако заказчика — допустимый контур. "
+            "Публичный облачный ИИ — по умолчанию запрещён для внутренних данных.",
+        ),
+        (
+            "Можно ли вынести обработку в облако?",
+            "Уточните назначение: client private cloud (часто да) или public LLM API (по умолчанию нет). "
+            "Без уточнения безопасный путь — локальный Outpost в периметре.",
+        ),
+        (
+            "Put this report in the cloud.",
+            "Which cloud? Customer private/VPC cloud is usually OK under policy. "
+            "Public LLM SaaS is off by default — use local Outpost until clarified.",
+        ),
+        (
+            "Облачный анализ ок?",
+            "Уточните: анализ во внутреннем облаке заказчика или через публичный LLM. "
+            "Публичный — нет по умолчанию. Внутренний контур — да при allowlist.",
+        ),
+        (
+            "Кинь в облако и сделай summary.",
+            "Не кидайте вслепую. "
+            "Публичный cloud LLM — отказ. "
+            "Своё облако/контур — да; иначе summary в Outpost локально.",
+        ),
+        (
+            "Мы про облако говорили — можно уже слать?",
+            "Нужно разделить: своё облако заказчика ≠ публичный ChatGPT. "
+            "Скажите, какой вариант. "
+            "Пока неясно — не отправляйте наружу, используйте Outpost.",
+        ),
+        (
+            "Можно отправить этот текст «в облако»?",
+            "Слово «облако» двусмысленно. "
+            "Private/client cloud — обычно да по политике. "
+            "Публичный LLM — нет по умолчанию; работайте в Outpost.",
+        ),
+        (
+            "Is cloud OK for this internal memo?",
+            "Clarify: customer private cloud vs public LLM. "
+            "Public LLM — no by default. Private contour — yes with allowlist; else Outpost local.",
+        ),
+    ]
+    for u, a in clarify_pairs:
+        rows.append(ex("contour_clarify", u, a))
+
+    formal_two = [
+        (
+            "Переформулируй официально ровно в 2 предложения: "
+            "Нам надо поставить ИИ внутри периметра и чтобы ИБ не ругалась.",
+            "Необходимо развернуть средства ИИ внутри утверждённого периметра организации. "
+            "Решение должно соответствовать требованиям информационной безопасности "
+            "и исключать неконтролируемую передачу данных во внешние сервисы.",
+        ),
+        (
+            "Официально, ровно два предложения: хотим ИИ у себя, без претензий от ИБ.",
+            "Требуется внедрение средств искусственного интеллекта внутри корпоративного периметра. "
+            "Архитектура должна удовлетворять требованиям ИБ и не допускать утечки данных "
+            "в неутверждённые внешние сервисы.",
+        ),
+        (
+            "Ровно 2 предложения официальным стилем: "
+            "Поставьте нейросеть локально, чтобы не светить ПДн наружу.",
+            "Нейросетевой сервис должен быть развёрнут локально в утверждённом контуре. "
+            "Это необходимо для исключения передачи персональных и служебных данных "
+            "во внешние публичные системы.",
+        ),
+        (
+            "Переформулируй ровно в 2 предложения: "
+            "Нам нужен offline AI на сервере банка без интернета.",
+            "Банку требуется offline AI-платформа на собственном серверном контуре. "
+            "Функционирование inference не должно зависеть от постоянного доступа к сети Интернет.",
+        ),
+        (
+            "Ровно два предложения: интегратор ставит Outpost заказчику в контур.",
+            "Интегратор осуществляет поставку и развёртывание Outpost в контуре заказчика. "
+            "Эксплуатация выполняется на инфраструктуре заказчика в соответствии с его политикой ИБ.",
+        ),
+        (
+            "Exactly 2 formal sentences: we need AI inside the perimeter for security.",
+            "The organization requires AI inference capabilities within the approved security perimeter. "
+            "The solution must prevent uncontrolled transfer of data to external public LLM services.",
+        ),
+        (
+            "Ровно 2 предложения: зачем BYOM для заказчика с жёсткой лицензией.",
+            "BYOM позволяет заказчику самостоятельно выбрать и лицензировать допустимую модель GGUF. "
+            "Платформа Outpost исполняет выбранные веса без навязывания чужой модели по умолчанию.",
+        ),
+        (
+            "Официально ровно 2 предложения: не шлите протоколы в ChatGPT.",
+            "Протоколы и иные внутренние материалы не подлежат передаче в публичные облачные LLM. "
+            "Обработка должна выполняться в локальном Outpost либо в утверждённом контуре заказчика.",
+        ),
+        (
+            "Ровно 2 предложения: что даёт air-gap для ИБ.",
+            "Режим air-gap исключает обязательный исходящий канал для выполнения inference. "
+            "Это снижает риск утечки содержимого запросов и упрощает соответствие политике изоляции.",
+        ),
+        (
+            "Переформулируй официально ровно в 2 предложения: "
+            "Сделайте так, чтобы модель работала без выхода в интернет.",
+            "Модель должна обеспечивать inference без обязательного доступа к сети Интернет. "
+            "Поставка весов и runtime осуществляется offline-носителем либо через внутреннее зеркало.",
+        ),
+    ]
+    for u, a in formal_two:
+        rows.append(ex("format_sentences", u, a))
+
+    airgap_rich = [
+        (
+            "Объясни простыми словами, что такое air-gap контур для AI-сервера. До 5 предложений.",
+            "Air-gap контур — это изолированная среда, где AI-серверу не нужен постоянный интернет. "
+            "Сервер и файл модели (GGUF) ставят с флешки, диска или внутреннего зеркала. "
+            "Пользовательские запросы считаются внутри периметра, а не в чужом SaaS. "
+            "Публичные ChatGPT-подобные сервисы по умолчанию не используются. "
+            "Так проще соблюдать ИБ и работать на закрытых сегментах сети.",
+        ),
+        (
+            "Что такое air-gap для локального LLM? Объясни в 4–5 предложениях.",
+            "Air-gap значит: inference не требует исходящего канала в интернет. "
+            "Модель и runtime заранее доставляют в контур заказчика. "
+            "Запросы и ответы остаются на площадке. "
+            "Это не запрет любого облака — запрет неуправляемого публичного LLM по умолчанию. "
+            "Outpost как раз рассчитан на такой режим.",
+        ),
+        (
+            "Простыми словами про air-gap AI: зачем банкам. 3–5 предложений.",
+            "Банку важно, чтобы содержимое запросов не уходило к внешнему SaaS. "
+            "Air-gap AI крутит модель на своих серверах без обязательного интернета. "
+            "Обновления и модели привозят контролируемым способом. "
+            "Так проще пройти требования ИБ и работу с ПДн. "
+            "Публичный ChatGPT для внутренних отчётов в таком режиме не используют.",
+        ),
+        (
+            "Explain air-gap AI contour in simple words. Up to 5 sentences.",
+            "An air-gap AI contour runs inference without required outbound internet. "
+            "The runtime and GGUF weights are installed from offline media or an internal mirror. "
+            "Prompts stay inside the customer perimeter. "
+            "Public cloud LLMs stay off by default. "
+            "That reduces leak risk and vendor network dependency.",
+        ),
+        (
+            "Распиши air-gap контур для AI-сервера чуть подробнее, но не больше пяти предложений.",
+            "В air-gap контуре AI-сервер изолирован от обязательного выхода наружу. "
+            "Администратор ставит Outpost и выбранный GGUF из проверенного комплекта. "
+            "Пользователи ходят к API внутри LAN или закрытого сегмента. "
+            "Исходящие коннекторы к публичным LLM выключены, пока политика явно не разрешит. "
+            "Своё private cloud при этом может оставаться частью контура.",
+        ),
+        (
+            "Новичок спрашивает: air-gap — это вообще без сети? До 5 предложений.",
+            "Часто да: нет маршрута в интернет для inference. "
+            "Иногда оставляют узкий канал только к своим сервисам по allowlist — это уже не «публичный LLM». "
+            "Главное — модель считает у вас, а не в ChatGPT. "
+            "Поставка весов идёт offline. "
+            "Для пилота Outpost обычно начинают с полностью локального контура.",
+        ),
+        (
+            "Сравни коротко: air-gap AI vs обычный облачный чат. 4 предложения.",
+            "Облачный чат шлёт текст во внешний сервис провайдера. "
+            "Air-gap AI обрабатывает запрос на вашем железе без обязательного egress. "
+            "Модель вы заранее положили в контур сами. "
+            "Поэтому air-gap ближе к требованиям ИБ для внутренних документов.",
+        ),
+        (
+            "Зачем air-gap, если у нас уже есть VPN? До 5 предложений.",
+            "VPN защищает канал, но не заменяет политику контура для LLM. "
+            "Если за VPN всё равно торчит публичный ChatGPT — данные уходят к третьей стороне. "
+            "Air-gap для AI значит: сам inference локальный или в своём контуре. "
+            "VPN полезен для доступа сотрудников к Outpost. "
+            "Но цель air-gap — не кормить внешний SaaS содержимым промптов.",
+        ),
+    ]
+    for u, a in airgap_rich:
+        rows.append(ex("general_ru", u, a))
+
+    allow_detail = [
+        (
+            "Можно ли подключить Outpost к нашему private cloud (VPC) для API?",
+            "Да — private cloud / VPC заказчика относится к контуру, это не публичный ChatGPT. "
+            "Подключайте только хосты из allowlist (API, storage, registry). "
+            "Egress в публичные LLM при этом остаётся выключенным по умолчанию. "
+            "Так вы сохраняете контроль периметра и можете масштабировать API внутри своего облака.",
+        ),
+        (
+            "Расскажи подробнее: Outpost и client cloud — что можно, чего нельзя.",
+            "Можно: деплой в VPC/private Kubernetes, вызовы ваших внутренних API, object storage по allowlist. "
+            "Нельзя по умолчанию: слать промпты в ChatGPT, Claude, Gemini и прочий публичный SaaS-LLM. "
+            "Разница не «облако плохо», а «чей контур и есть ли контроль».",
+        ),
+        (
+            "Мы в Yandex/VK/своём ЦОД-облаке. Это ок для Outpost?",
+            "Да, если это утверждённый контур заказчика и доступы ограничены allowlist. "
+            "Outpost там — нормальный вариант private/client cloud. "
+            "Публичные потребительские LLM API всё равно не включать без отдельного решения ИБ.",
+        ),
+        (
+            "Private cloud OK — значит можно и OpenAI API из того же VPC?",
+            "Нет автоматически. VPC заказчика ≠ разрешение на публичный LLM. "
+            "OpenAI API — отдельный egress к внешней модели; по умолчанию выключен. "
+            "Нужно явное решение политики; иначе оставайтесь на локальном/контурном GGUF.",
+        ),
+    ]
+    for u, a in allow_detail:
+        rows.append(ex("contour_allow_client", u, a))
+
+    return rows
+
+
+def build(version: str) -> list[dict]:
+    if version == "v0":
+        return build_v0()
+    if version == "v1":
+        return build_v0() + build_v1_extras()
+    raise ValueError(f"unknown version: {version}")
+
+
+_SENT_SPLIT = re.compile(r"(?<=[.!?…])\s+")
+
+
+def count_sentences(text: str) -> int:
+    parts = [p.strip() for p in _SENT_SPLIT.split(text.strip()) if p.strip()]
+    return len(parts)
+
+
+def validate(rows: list[dict]) -> None:
+    """Fail fast on v1 focus rules."""
+    for row in rows:
+        tag = row["tag"]
+        user = row["messages"][0]["content"]
+        asst = row["messages"][1]["content"].strip()
+        if tag == "contour_clarify":
+            low = asst.lower()
+            if low in {"нет", "да", "no", "yes"} or re.fullmatch(
+                r"(нет|да|no|yes)[.!]?", low
+            ):
+                raise ValueError(f"clarify must not be bare yes/no: {user!r} → {asst!r}")
+            if "уточн" not in low and "clarif" not in low and "какой" not in low and "which" not in low:
+                # soft: at least one disambiguation cue
+                if "private" not in low and "публич" not in low and "public" not in low:
+                    raise ValueError(f"clarify missing disambiguation: {user!r}")
+        if tag == "format_sentences" and re.search(
+            r"ровно\s+2|exactly\s+2|два предложения|2 предложения|2 formal",
+            user,
+            re.I,
+        ):
+            n = count_sentences(asst)
+            if n != 2:
+                raise ValueError(
+                    f"expected 2 sentences, got {n}: {user!r} → {asst!r}"
+                )
+
+
+def write_version(version: str) -> Path:
+    out_dir = ROOT / "datasets" / f"tiny-lora-{version}"
+    out_file = out_dir / "train.messages.jsonl"
+    stats_file = out_dir / "STATS.md"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    rows = build(version)
+    validate(rows)
+    with out_file.open("w", encoding="utf-8") as f:
         for row in rows:
             f.write(json.dumps(row, ensure_ascii=False) + "\n")
 
     counts = Counter(r["tag"] for r in rows)
     lines = [
-        "# tiny-lora-v0 stats",
+        f"# tiny-lora-{version} stats",
         "",
         f"Total examples: **{len(rows)}**",
         "",
@@ -287,11 +578,38 @@ def main() -> None:
     ]
     for tag, n in sorted(counts.items()):
         lines.append(f"| `{tag}` | {n} |")
+    if version == "v1":
+        lines.extend(
+            [
+                "",
+                "## v1 extras focus",
+                "",
+                "- `contour_clarify` — ambiguous «облако» → ask public vs private (never bare Нет)",
+                "- `format_sentences` — more exactly-2-sentence formal prompts",
+                "- `general_ru` — richer 3–5 sentence air-gap answers",
+                "- `contour_allow_client` — longer VPC/allowlist detail",
+            ]
+        )
     lines.append("")
-    lines.append(f"File: `{OUT_FILE.relative_to(ROOT)}`")
-    STATS_FILE.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    print(f"Wrote {len(rows)} → {OUT_FILE}")
-    print(f"Stats → {STATS_FILE}")
+    lines.append(f"File: `{out_file.relative_to(ROOT)}`")
+    stats_file.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(f"Wrote {len(rows)} → {out_file}")
+    print(f"Stats → {stats_file}")
+    return out_file
+
+
+def main() -> None:
+    p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument(
+        "--version",
+        choices=("v0", "v1", "all"),
+        default="v1",
+        help="which dataset to regenerate (default: v1)",
+    )
+    args = p.parse_args()
+    versions = ("v0", "v1") if args.version == "all" else (args.version,)
+    for ver in versions:
+        write_version(ver)
 
 
 if __name__ == "__main__":

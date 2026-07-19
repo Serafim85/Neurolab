@@ -34,15 +34,16 @@
 ## Regenerate
 
 ```bash
-python3 scripts/build_tiny_lora_data.py
+python3 scripts/build_tiny_lora_data.py --version v0
 ```
 
-## Train hint (next)
+For gap-fill set see **`manifest-tiny-lora-v1.md`**.
+
+## Train hint (historical v0)
 
 ```text
 data: datasets/tiny-lora-v0/train.messages.jsonl
 base: Qwen/Qwen2.5-3B-Instruct
-lora_rank: 16 · epochs: 1–2 · lr: ~2e-4
-export → merge → GGUF Q4 → artifacts/outpost-tiny-v0.Q4_K_M.gguf
-re-eval: ./scripts/run_baseline.sh vs 14/16
+lora_rank: 16 · epochs: 1 · lr: ~2e-4
+→ artifacts/outpost-tiny-v0.Q4_K_M.gguf · eval 15/20
 ```
