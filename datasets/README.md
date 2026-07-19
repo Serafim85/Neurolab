@@ -8,6 +8,8 @@
 | `tiny-lora-v1/` | clarify / formal×2 / richer airgap |
 | `manifest-tiny-lora-v1.2.md` | refuse reinforcement after v1.1 regression |
 | `tiny-lora-v1.2/` | hard ChatGPT refuse + clarify/formal |
+| `manifest-tiny-lora-v0plus.md` | **continue-from-v0** short pack |
+| `tiny-lora-v0plus/` | refuse/clarify + format anchors |
 | `base-qwen25-3b.md` | locked base GGUF pull notes |
 
 Крупные чужие корпуса — только локально / USB; в git — manifests + наш синтетический seed.

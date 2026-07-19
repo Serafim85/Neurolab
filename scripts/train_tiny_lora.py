@@ -63,6 +63,12 @@ def parse_args() -> argparse.Namespace:
         help="Resume from trainer checkpoint dir",
     )
     p.add_argument(
+        "--init-adapter",
+        type=Path,
+        default=None,
+        help="Continue training from existing PEFT adapter (e.g. Tiny-v0)",
+    )
+    p.add_argument(
         "--dtype",
         choices=("auto", "float16", "float32"),
         default="auto",
@@ -186,6 +192,7 @@ def write_notes(
 | lora_r | {args.lora_r} |
 | lora_alpha | {args.lora_alpha} |
 | load_in_4bit | {args.load_in_4bit} |
+| init_adapter | `{args.init_adapter or "—"}` |
 | adapter | `{run_dir / "adapter"}` |
 
 ## Next
@@ -215,7 +222,7 @@ def main() -> int:
     # Late imports so --help works without torch installed
     import torch
     from datasets import Dataset
-    from peft import LoraConfig
+    from peft import LoraConfig, PeftModel
     from transformers import (
         AutoModelForCausalLM,
         AutoTokenizer,
@@ -234,7 +241,14 @@ def main() -> int:
     run_dir.mkdir(parents=True, exist_ok=True)
 
     rows = load_messages_jsonl(args.data)
-    print(f"examples={len(rows)} base={args.base} device={device} out={run_dir}")
+    print(
+        f"examples={len(rows)} base={args.base} device={device} out={run_dir}"
+        + (f" init_adapter={args.init_adapter}" if args.init_adapter else "")
+    )
+
+    if args.init_adapter is not None and not args.init_adapter.is_dir():
+        print(f"ERROR: --init-adapter not found: {args.init_adapter}", file=sys.stderr)
+        return 1
 
     tokenizer = AutoTokenizer.from_pretrained(args.base, trust_remote_code=True)
     if tokenizer.pad_token is None:
@@ -281,23 +295,29 @@ def main() -> int:
         if hasattr(model, "enable_input_require_grads"):
             model.enable_input_require_grads()
 
-    # Qwen2 target modules
-    lora = LoraConfig(
-        r=args.lora_r,
-        lora_alpha=args.lora_alpha,
-        lora_dropout=args.lora_dropout,
-        bias="none",
-        task_type="CAUSAL_LM",
-        target_modules=[
-            "q_proj",
-            "k_proj",
-            "v_proj",
-            "o_proj",
-            "gate_proj",
-            "up_proj",
-            "down_proj",
-        ],
-    )
+    peft_config = None
+    if args.init_adapter is not None:
+        print(f"loading init adapter (trainable) ← {args.init_adapter}", flush=True)
+        model = PeftModel.from_pretrained(
+            model, str(args.init_adapter), is_trainable=True
+        )
+    else:
+        peft_config = LoraConfig(
+            r=args.lora_r,
+            lora_alpha=args.lora_alpha,
+            lora_dropout=args.lora_dropout,
+            bias="none",
+            task_type="CAUSAL_LM",
+            target_modules=[
+                "q_proj",
+                "k_proj",
+                "v_proj",
+                "o_proj",
+                "gate_proj",
+                "up_proj",
+                "down_proj",
+            ],
+        )
 
     def formatting(example: dict) -> str:
         return tokenizer.apply_chat_template(
@@ -338,13 +358,14 @@ def main() -> int:
         sft_kwargs["max_seq_length"] = args.max_seq_len
         sft_config = SFTConfig(**sft_kwargs)
 
-    trainer_kwargs = dict(
-        model=model,
-        args=sft_config,
-        train_dataset=ds,
-        peft_config=lora,
-        processing_class=tokenizer,
-    )
+    trainer_kwargs: dict = {
+        "model": model,
+        "args": sft_config,
+        "train_dataset": ds,
+        "processing_class": tokenizer,
+    }
+    if peft_config is not None:
+        trainer_kwargs["peft_config"] = peft_config
     try:
         trainer = SFTTrainer(
             **trainer_kwargs,
@@ -352,13 +373,7 @@ def main() -> int:
         )
     except TypeError:
         # Newer trl: dataset already messages + chat template via tokenizer
-        trainer = SFTTrainer(
-            model=model,
-            args=sft_config,
-            train_dataset=ds,
-            peft_config=lora,
-            processing_class=tokenizer,
-        )
+        trainer = SFTTrainer(**trainer_kwargs)
 
     trainer_ref: dict = {"trainer": trainer}
     nan_guard = _NanGuard(run_dir, trainer_ref)

@@ -1,0 +1,26 @@
+# Smoke: Tiny-v0 + short refuse/clarify continue
+
+[server]
+host = "127.0.0.1"
+port = 8093
+
+[models]
+dir = "/Users/valentin/Projects/neurolab/artifacts"
+active = "outpost-tiny-v0plus"
+path = "/Users/valentin/Projects/neurolab/artifacts/outpost-tiny-v0plus.Q4_K_M.gguf"
+
+[inference]
+memory_limit_mb = 6144
+threads = 4
+context_size = 4096
+chat_template = "chatml"
+system_prompt = """\
+Отвечай на русском, если вопрос на русском. Будь точным; соблюдай формат (маркеры/предложения), если задан.
+Не отправляй внутренние данные в публичные LLM. Своё/private cloud — допустимый контур.
+Если «облако» двусмысленно — уточни public vs private, не отвечай одним «нет».
+"""
+
+[audit]
+enabled = true
+log_path = "/Users/valentin/Projects/neurolab/artifacts/tiny-v0plus-audit.jsonl"
+log_prompt_content = false

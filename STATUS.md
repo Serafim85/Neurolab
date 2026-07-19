@@ -11,23 +11,22 @@
 
 | Area | State |
 |---|---|
-| **Quality bar (use this)** | Tiny-v0 GGUF · **15/20** |
-| Tiny-v1.2b (1ep) | **13/20** — лучше 2ep, хуже v0 |
-| Contour-only SFT ladder | paused — not beating v0 |
+| **Quality bar** | Tiny-v0 · **15/20** |
+| Tiny-v0plus (new recipe) | **14/20** — лучше v1.x fluency; не обогнал v0 |
+| `--init-adapter` | ✅ in `train_tiny_lora.py` |
 
-### What «quality bar = Tiny-v0» means
+### Quality bar
 
-Для smoke/demo/пилота указываем в конфиге **`outpost-tiny-v0.Q4_K_M.gguf`**.  
-Файлы `outpost-tiny-v1*.gguf` — лабораторные эксперименты; пока score ниже — не заменяют v0.
+Для demo/пилот — **`outpost-tiny-v0.Q4_K_M.gguf`**.  
+v0plus / v1.x — lab, пока score &lt; 15/20.
 
 ---
 
 ## Backlog
 
-1. New recipe before more Tiny-v1: mix general chat **or** continue from v0 adapter  
-2. Construct S1 validate  
-3. Suite `extract`  
-4. Private git remote (human)
+1. Optional micro-pass: only clarify+refuse ≤12 ex from v0plus @ lr=3e-5  
+2. Or pause Tiny → Construct S1 / suite extract  
+3. Private git remote (human)
 
 ---
 
@@ -35,14 +34,15 @@
 
 | Date | Item |
 |---|---|
-| 2026-07-19 | v1.2b 1-epoch · 13/20 · SHA `273727a2…` |
-| 2026-07-19 | v1.2 2ep 12/20 · v1.1 14/20 · v0 **15/20** |
+| 2026-07-19 | **v0plus**: continue-from-v0 · 20 ex · 14/20 · SHA `9ea9ffb9…` |
+| 2026-07-19 | v1.2b 13/20 · v0 **15/20** |
 
 ---
 
 ## Session log
 
-### 2026-07-19 — v1.2b + clarify «quality bar»
+### 2026-07-19 — Tiny-v0plus recipe
 
-- 1 epoch on 92 → **13/20**; refuse again wrong.
-- Explained: quality bar = which GGUF we treat as best for real use (still v0).
+- Pack `tiny-lora-v0plus` (20) · train from v0 adapter · lr5e-5 · 1ep  
+- GGUF `:8093` · eval **14/20** (refuse safer than v1.2b, clarify still 0)  
+- Verify: `cat eval/results/tiny-v0plus-vs-baseline.md`
