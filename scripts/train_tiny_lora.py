@@ -75,12 +75,63 @@ def parse_args() -> argparse.Namespace:
 def adapter_has_nan(adapter_dir: Path) -> bool:
     from safetensors import safe_open
 
-    for f in adapter_dir.glob("*.safetensors"):
+    for f in adapter_dir.rglob("*.safetensors"):
         with safe_open(f, framework="pt") as s:
             for key in s.keys():
                 if bool(s.get_tensor(key).isnan().any()):
                     return True
     return False
+
+
+def _copy_adapter(src: Path, dst: Path) -> None:
+    import shutil
+
+    if dst.exists():
+        shutil.rmtree(dst)
+    shutil.copytree(src, dst)
+
+
+class NanGuardCallback:
+    """Stop on NaN loss; keep last finite adapter under run_dir/adapter-last-good."""
+
+    def __init__(self, run_dir: Path, trainer_ref: dict):
+        self.run_dir = run_dir
+        self.trainer_ref = trainer_ref
+        self.last_good = run_dir / "adapter-last-good"
+        self.stopped_for_nan = False
+
+    def on_log(self, args, state, control, logs=None, **kwargs):  # noqa: ANN001
+        import math
+
+        if not logs:
+            return
+        loss = logs.get("loss")
+        if loss is None:
+            return
+        if isinstance(loss, float) and (math.isnan(loss) or math.isinf(loss)):
+            print(f"WARN: NaN/Inf loss at step {state.global_step} — stopping", flush=True)
+            self.stopped_for_nan = True
+            control.should_training_stop = True
+            control.should_save = False
+
+    def on_save(self, args, state, control, **kwargs):  # noqa: ANN001
+        ckpt = Path(args.output_dir) / f"checkpoint-{state.global_step}"
+        if not ckpt.is_dir():
+            return
+        if adapter_has_nan(ckpt):
+            print(f"WARN: NaN weights in {ckpt.name} — stopping", flush=True)
+            self.stopped_for_nan = True
+            control.should_training_stop = True
+            return
+        trainer = self.trainer_ref.get("trainer")
+        if trainer is None:
+            return
+        self.last_good.mkdir(parents=True, exist_ok=True)
+        trainer.model.save_pretrained(self.last_good)
+        if adapter_has_nan(self.last_good):
+            print("WARN: last-good save became NaN — ignoring", flush=True)
+            return
+        print(f"last-good ← step {state.global_step}", flush=True)
 
 
 def pick_device(name: str) -> str:
@@ -165,8 +216,16 @@ def main() -> int:
     import torch
     from datasets import Dataset
     from peft import LoraConfig
-    from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+    from transformers import (
+        AutoModelForCausalLM,
+        AutoTokenizer,
+        BitsAndBytesConfig,
+        TrainerCallback,
+    )
     from trl import SFTConfig, SFTTrainer
+
+    class _NanGuard(NanGuardCallback, TrainerCallback):
+        pass
 
     device = pick_device(args.device)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
@@ -259,7 +318,7 @@ def main() -> int:
         logging_steps=1,
         save_strategy="steps",
         save_steps=1,
-        save_total_limit=12,
+        save_total_limit=40,
         bf16=False,
         fp16=(device == "cuda" and quant is None),
         max_grad_norm=args.max_grad_norm,
@@ -301,6 +360,10 @@ def main() -> int:
             processing_class=tokenizer,
         )
 
+    trainer_ref: dict = {"trainer": trainer}
+    nan_guard = _NanGuard(run_dir, trainer_ref)
+    trainer.add_callback(nan_guard)
+
     # Avoid tokenizer parallelism warning noise
     os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
     if device == "mps":
@@ -311,20 +374,30 @@ def main() -> int:
         trainer.train(resume_from_checkpoint=str(args.resume))
     else:
         trainer.train()
+
     adapter_dir.mkdir(parents=True, exist_ok=True)
-    trainer.model.save_pretrained(adapter_dir)
     tokenizer.save_pretrained(adapter_dir)
+    source = adapter_dir
+    trainer.model.save_pretrained(adapter_dir)
     if adapter_has_nan(adapter_dir):
-        print(
-            f"ERROR: adapter contains NaN weights → {adapter_dir}\n"
-            "  Retry with: --dtype float32 --lr 1e-4 --max-grad-norm 0.3",
-            file=sys.stderr,
-        )
-        return 3
+        good = run_dir / "adapter-last-good"
+        if good.is_dir() and not adapter_has_nan(good):
+            print(f"WARN: final adapter NaN — restoring {good}", flush=True)
+            _copy_adapter(good, adapter_dir)
+            source = good
+        else:
+            print(
+                f"ERROR: adapter contains NaN weights → {adapter_dir}\n"
+                "  Retry with: --lr 8e-5 --max-grad-norm 0.3 (MPS-stable)",
+                file=sys.stderr,
+            )
+            return 3
     write_notes(run_dir, args, device, len(rows))
 
-    print(f"OK adapter → {adapter_dir}")
+    print(f"OK adapter → {adapter_dir} (from {source.name})")
     print(f"OK notes   → {run_dir / 'NOTES.md'}")
+    if nan_guard.stopped_for_nan:
+        print("NOTE: training stopped early due to NaN; using last-good weights")
     print("Next: python3 scripts/merge_tiny_lora.py --adapter", adapter_dir)
     return 0
 
