@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CS-P04 · Diff — Closed Sandbox</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="banner">
+    <span class="mark">PORTED</span>
+    <strong>CS-P04 · Diff</strong>
+    <span>FR-UI-020 · CLI parity: <code style="font-family:var(--mono);color:var(--accent)">closed-sandbox diff</code></span>
+  </div>
+  <nav class="topnav">
+    <a href="/">CS-P01 Overview</a>
+    <a href="/editor">CS-P02 Editor</a>
+    <a href="/run">CS-P03 Run</a>
+    <a class="active" href="/diff">CS-P04 Diff</a>
+    <a href="/ask">CS-P05 Ask</a>
+  </nav>
+  <main>
+    <h1>Diff versions</h1>
+    <p class="lead">
+      Side-by-side metrics delta. Same shape as
+      <code>closed-sandbox diff a.json b.json</code>
+      (<code>n_changed</code> + <code>changed</code>).
+      Host: neurolab <code>sandbox/ui/</code> (NL-ADR-018).
+    </p>
+    <div class="meta">
+      <span>fr: FR-UI-020</span>
+      <span>parity: CS-P04.yaml</span>
+      <span id="meta-status">idle</span>
+    </div>
+
+    <h2>Pick metrics</h2>
+    <div class="pick">
+      <label>A · metrics.json
+        <input id="path-a" type="text" spellcheck="false"
+          value="examples/anomaly_v0/out/seed42/metrics.json" />
+      </label>
+      <label>B · metrics.json
+        <input id="path-b" type="text" spellcheck="false"
+          value="examples/anomaly_v0/out/seed43/metrics.json" />
+      </label>
+      <button type="button" class="btn primary" id="diff">Diff</button>
+    </div>
+    <p class="hint">
+      A and B must be different files (e.g. two Run seeds).
+      Change paths then press Diff (or Enter). Try seed42 vs seed43 vs seed50.
+    </p>
+    <p class="summary" id="summary">loading …</p>
+
+    <h2>Changed keys</h2>
+    <table>
+      <thead>
+        <tr><th>Key</th><th>a</th><th>b</th><th>delta</th></tr>
+      </thead>
+      <tbody id="diff-body">
+        <tr><td colspan="4"><code>—</code></td></tr>
+      </tbody>
+    </table>
+  </main>
+  <script src="/static/diff.js"></script>
+</body>
+</html>

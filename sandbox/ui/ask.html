@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CS-P05 · Ask — Closed Sandbox</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="banner">
+    <span class="mark">PORTED</span>
+    <strong>CS-P05 · Ask</strong>
+    <span>FR-UI-030 / 031 · CLI parity: <code style="font-family:var(--mono);color:var(--accent)">closed-sandbox ask</code></span>
+  </div>
+  <nav class="topnav">
+    <a href="/">CS-P01 Overview</a>
+    <a href="/editor">CS-P02 Editor</a>
+    <a href="/run">CS-P03 Run</a>
+    <a href="/diff">CS-P04 Diff</a>
+    <a class="active" href="/ask">CS-P05 Ask</a>
+  </nav>
+  <main>
+    <h1>Ask assistant</h1>
+    <p class="lead">
+      Chat with metrics attached. Provider <code>local</code> (Outpost) or <code>public</code>
+      (egress risk). Public mode always shows a risk banner (FR-UI-031).
+    </p>
+    <div class="meta">
+      <span>fr: FR-UI-030,031</span>
+      <span>parity: CS-P05.yaml</span>
+      <span id="meta-status">idle</span>
+    </div>
+
+    <div class="ask-bar">
+      <label>project.toml
+        <input id="project" type="text" spellcheck="false"
+          value="examples/anomaly_v0/project.toml" />
+      </label>
+      <label>metrics.json
+        <input id="metrics" type="text" spellcheck="false"
+          value="examples/anomaly_v0/out/seed42/metrics.json" />
+      </label>
+      <label>[contour] provider
+        <select id="provider" aria-label="provider">
+          <option value="local" selected>local</option>
+          <option value="public">public</option>
+        </select>
+      </label>
+    </div>
+
+    <div id="banner-local" class="local-ok">
+      <span class="chip local">LOCAL</span>
+      <span>Contour quiet · data stays on machine (default).</span>
+    </div>
+    <div id="banner-public" class="risk" role="alert" hidden>
+      <strong>WARNING</strong>
+      <span>provider=public — manifest/metrics may leave the machine. Prefer local Outpost for air-gap.</span>
+    </div>
+
+    <div class="attach" id="attach">attached · …</div>
+
+    <div class="thread">
+      <div id="thread-msgs"></div>
+      <div class="composer">
+        <input id="question" type="text" spellcheck="true"
+          placeholder="State whether budget_ok is true. One short sentence."
+          value="State whether budget_ok is true. One short sentence." />
+        <button type="button" class="btn primary" id="ask">Ask</button>
+      </div>
+    </div>
+    <p class="hint">Needs local Outpost on contour.base_url (default :8090) or public API key env.</p>
+  </main>
+  <script src="/static/ask.js"></script>
+</body>
+</html>

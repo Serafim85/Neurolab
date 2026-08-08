@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CS-P03 · Run + Results — Closed Sandbox</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="banner">
+    <span class="mark">PORTED</span>
+    <strong>CS-P03 · Run + Results</strong>
+    <span>FR-UI-010 / 011 / 012 · CLI parity: <code style="font-family:var(--mono);color:var(--accent)">closed-sandbox run</code></span>
+  </div>
+  <nav class="topnav">
+    <a href="/">CS-P01 Overview</a>
+    <a href="/editor">CS-P02 Editor</a>
+    <a class="active" href="/run">CS-P03 Run</a>
+    <a href="/diff">CS-P04 Diff</a>
+    <a href="/ask">CS-P05 Ask</a>
+  </nav>
+  <main>
+    <h1>Run + Results</h1>
+    <p class="lead">
+      Same metric keys as <code>out/metrics.json</code> + export JSON / Markdown.
+      Host: neurolab <code>sandbox/ui/</code> (NL-ADR-018).
+    </p>
+    <div class="meta">
+      <span>fr: FR-UI-010,011,012</span>
+      <span>parity: CS-P03.yaml</span>
+      <span id="meta-path">project: …</span>
+    </div>
+
+    <h2>Run console</h2>
+    <div class="runbar">
+      <label>project.toml
+        <input id="project" type="text" spellcheck="false"
+          placeholder="examples/anomaly_v0/project.toml" />
+      </label>
+      <label>seed<input id="seed" type="number" value="42" /></label>
+      <label>scenarios
+        <select id="scenarios" title="Informational — engine runs full manifest set">
+          <option>…</option>
+        </select>
+      </label>
+      <button type="button" class="btn primary" id="run">Run</button>
+      <button type="button" class="btn warn" id="cancel" disabled title="Cancel waived: sync engine">Cancel</button>
+    </div>
+    <div class="progress" id="progress" aria-hidden="true"><i></i></div>
+    <div class="prog-label" id="prog-label">idle · press Run — status updates here</div>
+    <p class="hint">After Run: metrics flip to … then fill; green line = done. Scenario rows use <code>by_scenario</code> (D0–D4 = generative split conditions; mode <code>split</code>).</p>
+
+    <h2>Metrics · out/metrics.json</h2>
+    <div class="metrics" id="metrics">
+      <div class="metric"><div class="k">f1</div><div class="v">—</div></div>
+      <div class="metric"><div class="k">accuracy</div><div class="v">—</div></div>
+      <div class="metric"><div class="k">spike_count</div><div class="v">—</div></div>
+      <div class="metric"><div class="k">synops</div><div class="v">—</div></div>
+      <div class="metric"><div class="k">latency_proxy_ms</div><div class="v">—</div></div>
+      <div class="metric"><div class="k">budget_ok</div><div class="v">—</div></div>
+    </div>
+
+    <h2>Scenarios (per-condition)</h2>
+    <table>
+      <thead>
+        <tr><th>Scenario</th><th>n</th><th>f1</th><th>accuracy</th><th>spike_count</th><th>synops</th></tr>
+      </thead>
+      <tbody id="scenario-body">
+        <tr><td colspan="6"><code>—</code></td></tr>
+      </tbody>
+    </table>
+
+    <h2>Export · FR-UI-012</h2>
+    <div class="exports">
+      <button type="button" class="btn" id="dl-metrics">Download metrics.json</button>
+      <button type="button" class="btn" id="dl-report">Download report.md</button>
+    </div>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>

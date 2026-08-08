@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CS-P02 · Editor — Closed Sandbox</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="banner">
+    <span class="mark">PORTED</span>
+    <strong>CS-P02 · Manifest editor</strong>
+    <span>FR-UI-002 · CLI parity: <code style="font-family:var(--mono);color:var(--accent)">validate project.toml</code></span>
+  </div>
+  <nav class="topnav">
+    <a href="/">CS-P01 Overview</a>
+    <a class="active" href="/editor">CS-P02 Editor</a>
+    <a href="/run">CS-P03 Run</a>
+    <a href="/diff">CS-P04 Diff</a>
+    <a href="/ask">CS-P05 Ask</a>
+  </nav>
+  <main>
+    <h1>Manifest · <code style="font-family:var(--mono);font-size:14px;color:var(--accent)">project.toml</code></h1>
+    <p class="lead">
+      Edit raw TOML; validate before Run. Invalid blocks Run (FR-UI-002).
+    </p>
+    <div class="meta">
+      <span>fr: FR-UI-002</span>
+      <span>parity: CS-P02.yaml</span>
+      <span id="meta-status">idle</span>
+    </div>
+
+    <div class="ask-bar">
+      <label>project.toml
+        <input id="path" type="text" spellcheck="false"
+          value="examples/anomaly_v0/project.toml" />
+      </label>
+      <button type="button" class="btn" id="load">Load</button>
+      <button type="button" class="btn" id="validate">Validate</button>
+      <button type="button" class="btn" id="save">Save</button>
+      <button type="button" class="btn primary" id="run" disabled title="Validate first">Run</button>
+    </div>
+
+    <div class="row badges" id="badges">
+      <span class="badge" id="badge-domain">domain · —</span>
+      <span class="badge warn" id="badge-id">project · —</span>
+    </div>
+
+    <div class="tabs">
+      <button type="button" class="on" data-tab="form" id="tab-form">Form</button>
+      <button type="button" data-tab="raw" id="tab-raw">Raw TOML</button>
+    </div>
+
+    <div class="split" id="pane-form">
+      <div class="panel">
+        <h2>Form (key fields)</h2>
+        <div class="form">
+          <label>n_hidden <span>[network]</span>
+            <input id="f-n-hidden" type="number" />
+          </label>
+          <label>max_spikes_per_sample <span>[budget]</span>
+            <input id="f-max-spikes" type="number" />
+          </label>
+          <label>seed <span>[sandbox]</span>
+            <input id="f-seed" type="number" />
+          </label>
+          <label>provider <span>[contour]</span>
+            <select id="f-provider">
+              <option value="local">local</option>
+              <option value="public">public</option>
+            </select>
+          </label>
+          <label>metric_primary <span>[task]</span>
+            <input id="f-metric" type="text" />
+          </label>
+          <button type="button" class="btn" id="apply-form">Apply form → raw</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Preview</h2>
+        <pre id="form-preview" class="preview">Load a project.toml</pre>
+      </div>
+    </div>
+
+    <div class="panel" id="pane-raw" hidden>
+      <h2>Raw · project.toml</h2>
+      <textarea id="toml" class="toml" spellcheck="false" rows="22"></textarea>
+    </div>
+
+    <div id="msg" class="err" hidden></div>
+    <div id="okmsg" class="local-ok" hidden>VALIDATION OK — Run enabled</div>
+  </main>
+  <script src="/static/editor.js"></script>
+</body>
+</html>

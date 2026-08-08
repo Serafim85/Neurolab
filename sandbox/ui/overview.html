@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CS-P01 · Overview — Closed Sandbox</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="banner">
+    <span class="mark">PORTED</span>
+    <strong>CS-P01 · Overview</strong>
+    <span>FR-UI-001 · CLI parity: <code style="font-family:var(--mono);color:var(--accent)">examples/* + out/metrics.json</code></span>
+  </div>
+  <nav class="topnav">
+    <a class="active" href="/">CS-P01 Overview</a>
+    <a href="/editor">CS-P02 Editor</a>
+    <a href="/run">CS-P03 Run</a>
+    <a href="/diff">CS-P04 Diff</a>
+    <a href="/ask">CS-P05 Ask</a>
+  </nav>
+  <main>
+    <h1>Projects</h1>
+    <p class="lead">
+      List <code>examples/*</code> + last metrics. Status readable in ≤3s.
+      Host: neurolab <code>sandbox/ui/</code> (NL-ADR-018).
+    </p>
+    <div class="meta">
+      <span>fr: FR-UI-001</span>
+      <span>parity: CS-P01.yaml</span>
+      <span id="meta-status">loading…</span>
+    </div>
+    <div class="toolbar">
+      <button type="button" class="btn primary" id="open-default">Open anomaly-v0 · Run</button>
+      <button type="button" class="btn" id="refresh">Refresh</button>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Project</th>
+          <th>Domain</th>
+          <th>Last run</th>
+          <th>f1</th>
+          <th>spike_count</th>
+          <th>budget_ok</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="project-body">
+        <tr><td colspan="8"><code>—</code></td></tr>
+      </tbody>
+    </table>
+    <p class="hint">Metric keys match CLI: f1 · spike_count · budget_ok · synops · latency_proxy_ms</p>
+  </main>
+  <script src="/static/overview.js"></script>
+</body>
+</html>
