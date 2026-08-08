@@ -494,7 +494,8 @@
   never checked, and stood for three weeks.
 - `7B` / `14B` / `32B`-Instruct are Apache-2.0 in **both** the metadata field and the `LICENSE`
   body (checked, not assumed). `72B` is a different licence (`qwen`) and is not an escape route.
-- Lab machine: **M1 Pro, 16 GB unified memory, ~7 GB free disk**.
+- Lab machine: **M1 Pro, 16 GB unified memory**. Disk was down to ~7 GB free; see
+  consequence below — that part is now fixed and is no longer an argument.
 - Our own recipe states `--load-in-4bit` is CUDA/QLoRA only, and Unsloth breaks Apple Silicon
   (`docs/TRAIN-TINY-LORA.md` §0, §2).
 - Training data is **small**: 11 sets, 13–92 examples each, 456 total.
@@ -505,12 +506,14 @@
    already removes the licence problem, and 14B Q4 inference (~9 GB) would crowd a 16 GB box.
 2. Until a 7B line exists, the **3B line is research / evaluation only**. No current GGUF may be
    distributed commercially, and no claim of the right to do so (`CLAIMS.md` §7).
-3. **The blocker is the training venue, not the data.** 7B LoRA cannot run here: FP16 weights
-   (~15 GB) plus activations exceed 16 GB unified memory, and the download alone exceeds the
-   ~7 GB of free disk. Viable venues: a rented 24 GB CUDA card (the QLoRA 4-bit path already
-   exists in `scripts/train_tiny_lora.py`), or a larger Mac. Either needs human budget approval.
-4. **Reclaim disk regardless of the outcome:** ~40 GB of `artifacts/*.f16.gguf` are intermediates,
-   absent from git, and reproducible from the adapter via `merge_tiny_lora.py`.
+3. **The blocker is memory, and only memory.** 7B FP16 weights (~15 GB) plus activations do not
+   fit 16 GB of unified memory, and our recipe's 4-bit path is CUDA-only. Before spending money,
+   **check the MLX route**: Apple's MLX does LoRA over a 4-bit quantised model on Apple Silicon,
+   which should put 7B inside 16 GB. Unverified, and absent from `docs/TRAIN-TINY-LORA.md` §0 —
+   verify it first, because if it holds there is no budget question at all. Fallbacks: a rented
+   24 GB CUDA card (the QLoRA path already exists in `scripts/train_tiny_lora.py`) or a larger
+   Mac, and both need human budget approval.
+4. **Disk is no longer an argument** — see consequences.
 5. Re-collect the ladder on 7B with `scripts/score_agent_eval.py` at temperature 0 with repeats.
    **Carry no 3B number across** — a new base means a new baseline, not a rebased comparison.
 
@@ -527,4 +530,14 @@
 - `outpost-tiny-hammer2.Q4_K_M.gguf` is byte-identical to `hammer` (`3a712954…`; all other
   eleven Q4 artifacts hash distinctly, so the ladder is otherwise real). Resolve that duplicate
   before any re-climb so the new ladder does not inherit a phantom rung.
+- **Disk, done 2026-08-08:** `artifacts/` held **216 GB**, of which only ~26 GB was irreplaceable
+  (12 Q4 GGUFs, 19 LoRA adapters at ~125 MB each, base). Deleting `runs/*/trainer` — HF trainer
+  checkpoints, the scaffolding rather than the output — freed **84 GB**, taking free space from
+  6.6 GB to 91 GB. Two runs had no `adapter/` dir and kept their only weights inside those
+  checkpoints (`20260719-085839`, `20260719-mps-v1.1-nan12e4`); both were copied out to
+  `adapter-rescued/` with provenance before deletion. Verified after: `hammer` still hashes
+  `3a712954…`, 19 adapters and 19 `NOTES.md` intact.
+- Still reclaimable if ever needed: `artifacts/hf/` (63 GB) and `artifacts/*.f16.gguf` (40 GB) are
+  regenerable from adapter + `merge_tiny_lora.py`, at the cost of an FP16 base download and merge
+  time. Not deleted, since 91 GB is already ample for a 7B move.
 
