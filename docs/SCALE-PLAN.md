@@ -46,9 +46,12 @@
 ### Phase N0 — Foundation Lab ✅ / in progress
 
 - [x] Repo + agent docs
-- [x] Locked base 3B + baseline 14/16
-- [ ] LoRA data (refuse + format)
-- [ ] Tiny-v0/v1 adapt → re-eval
+- [x] Locked base 3B + baseline 14/16 (шкала /16 на 8 промптах — историческая)
+- [x] LoRA data (refuse + format) — `datasets/tiny-lora-{v0,v1,v1.2,hammer*}`
+- [x] Tiny-v0/v1 adapt → re-eval — лестница доведена до hammer2
+
+**Дальнейшая гонка по Tiny LoRA sheet — на паузе** (см. `STATUS.md` §Next).
+Текущее состояние и цифры не дублируются здесь по этой же причине.
 
 ### Phase N1 — Tiny shippable
 

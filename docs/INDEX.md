@@ -3,8 +3,9 @@
 | Документ | Содержание |
 |---|---|
 | [`../AGENTS.md`](../AGENTS.md) | **Старт для агентов** — ритуал, запреты, фильтр задач |
-| [`../STATUS.md`](../STATUS.md) | Done / In progress / Backlog / Session log |
-| [`AGENT-BRIEFS/README.md`](AGENT-BRIEFS/README.md) | **Параллельные брифы** A–D (Studio / pilot / agent-eval / Synapse bridge) |
+| [`../STATUS.md`](../STATUS.md) | **Единственный источник текущего фокуса** (§Summary + §Next) + Session log |
+| [`SESSIONS-2026-07.md`](SESSIONS-2026-07.md) | **Архив Session log** за июль 2026 (вынесен из STATUS 2026-08-08) |
+| [`AGENT-BRIEFS/README.md`](AGENT-BRIEFS/README.md) | **Параллельные брифы**: волна 1 A–D, волна 2 E–I (audit follow-through) |
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | Архитектура сети и Lab→Outpost |
 | [`CONSTRUCT.md`](CONSTRUCT.md) | **Управляемый конструкт** слотов + автоподстройка к железу |
 | [`SYNAPSE-BRIDGE.md`](SYNAPSE-BRIDGE.md) | **Pointer** → Synapse Brain bridge (bio / escalate contract) |

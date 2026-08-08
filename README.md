@@ -35,7 +35,9 @@ Commercial runtime: `~/Projects/AI-Platform-Vision`
 | **A — Outpost-Tiny** | dense chat на Qwen2.5-3B → LoRA → GGUF |
 | **B — Micro-MoE suite** | extract / summarize / router как отдельные GGUF |
 
-Сейчас: **Track A baseline accepted (14/16)** → подготовка LoRA.
+Текущий фокус и актуальные цифры — **только** в [`STATUS.md`](STATUS.md)
+(§Summary + §Next). Здесь их намеренно нет: дублирование однажды уже привело
+к четырём расходящимся описаниям «сейчас».
 
 ---
 

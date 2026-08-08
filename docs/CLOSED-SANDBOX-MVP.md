@@ -1,6 +1,6 @@
 # Closed Sandbox MVP — студия мозгоподобных сетей в закрытом контуре
 
-> **Status:** draft for coding (2026-07-26)  
+> **Status:** v0.1 код есть — D0–D4 + UI CS-P01…P05 в `sandbox/` (прогоны — §9)  
 > **ADR:** NL-ADR-010 … 015  
 > **Code:** `sandbox/`  
 > **Canon (наука):** [`CLOSED-SANDBOX-CANON.md`](CLOSED-SANDBOX-CANON.md)  
@@ -55,8 +55,8 @@ project manifest → engine.run(scenarios) → metrics + report → diff → ask
 | Слой | Что | Сейчас |
 |---|---|---|
 | **AI assistant (`ask`)** | Советы, разбор отчёта, правки манифеста | **Целевой:** hammer2 / Outpost. **Lab:** opt-in public LLM (§7). Pharma-grade R&D chat → Mid later |
-| **Объект проектирования** | Зависит от `domain` (v0 = SNN) | **ещё нет** — код в `sandbox/` |
-| **Sandbox core** | scenarios, metrics schema, report, diff | **ещё нет** |
+| **Объект проектирования** | Зависит от `domain` (v0 = SNN) | **есть** — `sandbox/src/closed_sandbox/domains/` D0–D4 |
+| **Sandbox core** | scenarios, metrics schema, report, diff | **есть** — `engine.py` / `report.py` / CLI |
 
 Итого: Neurolab даёт ассистента. `sandbox/` — ядро платформы + первый domain pack D0.
 
@@ -248,7 +248,13 @@ DoD прогона: JSON metrics + короткий markdown report. Без ме
 - [x] Нет секретов / больших датасетов в git
 - [x] Запись в `STATUS.md` Session log
 
+**Verified 2026-08-08:** unit **51 passed** (`-m "not integration"`, 3 deselected).
+Integration в этот прогон **не запускался** — нужен Metal/GPU host + Commercial
+release `sovereignd`; последний зелёный прогон — 2026-07-28.
+
 **Verified 2026-07-28:** unit **11 passed**; integration **3 passed** (host Mac).
+
+Полный лист прогонов: [`CLOSED-SANDBOX-VERIFY.md`](CLOSED-SANDBOX-VERIFY.md).
 
 ---
 

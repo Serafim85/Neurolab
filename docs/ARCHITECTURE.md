@@ -127,16 +127,13 @@ handoff → Commercial pack / BYOM path
 
 ---
 
-## 6. Current focus vs future topology
+## 6. Current focus → STATUS
 
-| Сейчас делаем | Куда встраиваем | Потом |
-|---|---|---|
-| Tiny baseline + LoRA на 3B | `[models].path` / curated pack | default «Outpost Chat» small |
-| Eval harness | CI-подобные скрипты Lab | gate перед каждым pack |
-| Suite cards (draft) | `agents.toml` stages | micro-MoE в пилоте |
-| Mid/Large | центральный сервер контура | после Tiny quality bar |
+**Текущий фокус здесь не описан.** Единственный источник — [`../STATUS.md`](../STATUS.md)
+§Summary + §Next; этот документ отвечает за топологию, а не за то, что делается сегодня.
 
-Полный план размеров: `docs/SCALE-PLAN.md`.  
+Принцип, который от фокуса не зависит: следующий уровень лестницы открывается
+только после измеренного результата на текущем — `docs/SCALE-PLAN.md`.  
 Куда именно в продукт: `docs/INTEGRATION.md`.
 
 ---
