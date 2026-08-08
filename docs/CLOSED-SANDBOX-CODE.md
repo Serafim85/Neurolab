@@ -58,7 +58,13 @@ def run(project: dict, *, seed: int) -> dict:
 
 - `run` **чист** от сети/LLM (кроме чтения локальных fixture paths).  
 - Возврат: JSON-serializable dict.  
-- Обязательные ключи (D0): `f1` или `accuracy`, `spike_count`, `synops`, `latency_proxy_ms`, `budget_ok`.  
+- Обязательные ключи — **два уровня** (NL-ADR-025):
+  - **ядро, любой домен:** `metric_primary`, значение под этим именем, `budget_ok`;
+  - **семейство `snn`** (`METRICS_FAMILY = "snn"` в модуле плагина — `snn_lif`, `neuro_chip`,
+    `biosignal`, `hybrid`): дополнительно `spike_count`, `synops` и `f1` либо `accuracy`.
+  
+  Семейство — свойство реализации, а не проекта: в манифест его не выносим, иначе строгость D0
+  можно ослабить правкой TOML без ревью плагина.  
 - Domain-specific ключи — с префиксом (`bio_`, `chip_`) later.  
 - Падение: явный exception с *что сделать*; не silent NaN.
 

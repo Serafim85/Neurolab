@@ -209,7 +209,11 @@ model = "outpost-tiny-hammer"
 | `latency_proxy_ms` | Грубая оценка (sim time или event rate) |
 | `budget_ok` | Уложились ли в max_neurons/synapses/spikes |
 
-Для будущих доменов (D2 biocompute) схема metrics расширяется domain-specific полями (`resource_proxy`, `circuit_size`, …), но **общие** `metric_primary` + report/diff остаются.
+Таблица выше — контракт **семейства `snn`** (D0/D1/D3/D4), а не всех доменов. Ядро требует только
+`metric_primary` + значение + `budget_ok`, поэтому неспайковый домен законен и не обязан возвращать
+`spike_count` / `synops` (NL-ADR-025 · канон: [`CLOSED-SANDBOX-CODE.md`](CLOSED-SANDBOX-CODE.md) §3).
+Domain-specific поля (`resource_proxy`, `circuit_size`, …) добавляются сверху, а `metric_primary` +
+report/diff остаются общими.
 
 DoD прогона: JSON metrics + короткий markdown report. Без метрик — прогон не засчитывается (как eval в Lab).
 
