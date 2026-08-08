@@ -470,3 +470,61 @@
 - D4 is the first **cross-domain composition** proof; richer fronts (GRN events, partner MEA files) = later kinds.  
 - UI two-pane still needs separate ★ (not this ADR).
 
+---
+
+> **Reserved numbers.** `NL-ADR-025` is taken by the metrics envelope: wave-2 track F
+> already cites it in shipped code (`sandbox/src/closed_sandbox/engine.py`,
+> `sandbox/tests/test_metrics_envelope.py`), so renumbering would mean editing source.
+> `026` is reserved for "STATUS is the single source of focus" (track G) and `027` for
+> "outward numbers are quoted only from `CLAIMS.md`" (track H). Drafts live in
+> `docs/AGENT-BRIEFS/results/{F,G,H}.md` and still need to be written up here.
+
+---
+
+## NL-ADR-028 — Locked base must leave Qwen2.5-3B (licence); target 7B
+
+**Status:** **Proposed** (2026-08-08) — needs human (`AGENTS.md` §9). Supersedes NL-ADR-002 if accepted.
+
+**Context:**
+
+- `Qwen2.5-3B-Instruct` is **`qwen-research`, non-commercial only**, and clause 2.a covers
+  derivative works — so every LoRA merge and GGUF we ship inherits it, `hammer` included.
+  Verified against the official model card: `docs/BASE-LICENSE.md`.
+- NL-ADR-002 locked this base while two files in the repo asserted Apache-2.0. That was wrong,
+  never checked, and stood for three weeks.
+- `7B` / `14B` / `32B`-Instruct are Apache-2.0 in **both** the metadata field and the `LICENSE`
+  body (checked, not assumed). `72B` is a different licence (`qwen`) and is not an escape route.
+- Lab machine: **M1 Pro, 16 GB unified memory, ~7 GB free disk**.
+- Our own recipe states `--load-in-4bit` is CUDA/QLoRA only, and Unsloth breaks Apple Silicon
+  (`docs/TRAIN-TINY-LORA.md` §0, §2).
+- Training data is **small**: 11 sets, 13–92 examples each, 456 total.
+
+**Decision (proposed):**
+
+1. Target locked base = **`Qwen2.5-7B-Instruct`** (Apache-2.0). Not 14B as the next step: 7B
+   already removes the licence problem, and 14B Q4 inference (~9 GB) would crowd a 16 GB box.
+2. Until a 7B line exists, the **3B line is research / evaluation only**. No current GGUF may be
+   distributed commercially, and no claim of the right to do so (`CLAIMS.md` §7).
+3. **The blocker is the training venue, not the data.** 7B LoRA cannot run here: FP16 weights
+   (~15 GB) plus activations exceed 16 GB unified memory, and the download alone exceeds the
+   ~7 GB of free disk. Viable venues: a rented 24 GB CUDA card (the QLoRA 4-bit path already
+   exists in `scripts/train_tiny_lora.py`), or a larger Mac. Either needs human budget approval.
+4. **Reclaim disk regardless of the outcome:** ~40 GB of `artifacts/*.f16.gguf` are intermediates,
+   absent from git, and reproducible from the adapter via `merge_tiny_lora.py`.
+5. Re-collect the ladder on 7B with `scripts/score_agent_eval.py` at temperature 0 with repeats.
+   **Carry no 3B number across** — a new base means a new baseline, not a rebased comparison.
+
+**Consequences:**
+
+- Every ladder number resets. `C-01`…`C-06` in `CLAIMS.md` become historical and tied to a
+  research-only base; they stay quotable as lab history, not as product capability.
+- The cheap part is data: 456 examples already curated, no new labelling. The cost is venue plus
+  re-eval, and re-eval is now largely automated (track E scorer) — unlike the first climb.
+- Compute is genuinely small: 40–90 examples × 2 epochs per set, so the whole 11-set ladder is a
+  couple of GPU-hours on a 24 GB card. This is a **budget decision, not a training campaign**.
+- If the budget is declined, the lab stays a legitimate research track — but the pilot pack cannot
+  ship weights, and GTM must say so instead of implying otherwise.
+- `outpost-tiny-hammer2.Q4_K_M.gguf` is byte-identical to `hammer` (`3a712954…`; all other
+  eleven Q4 artifacts hash distinctly, so the ladder is otherwise real). Resolve that duplicate
+  before any re-climb so the new ladder does not inherit a phantom rung.
+
