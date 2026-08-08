@@ -36,7 +36,7 @@ Do **not** promote micro / diverse / agent* for a pilot. They are experiments;
 | Base GGUF | `artifacts/base/Qwen2.5-3B-Instruct-Q4_K_M.gguf` · 1.80 GiB |
 | SHA256 (disk) | `d44e2c5d1ec3cae1d5cf6a744bee528e46c65a1e66e741fa92730967e7d625bb` |
 | Recorded SHA | match (`artifacts/base/SHA256.txt`) |
-| Upstream LICENSE | **MISSING** — no license text recorded in this repo; required by `AGENTS.md` §5.7. Do not assume Apache-2.0 |
+| Upstream LICENSE | `docs/BASE-LICENSE.md` |
 
 ### Artifacts on disk
 
@@ -94,9 +94,13 @@ Never merge a model row and a model+runtime row into one number. Citable wording
 - **Raw per-prompt evidence is not in git** (`.gitignore`: `eval/results/raw/`),
   and for the contour sheet the 20/20 run left an empty raw directory. The
   score tables in `eval/results/*.md` are currently the only record.
-- **Upstream LICENSE is not recorded in this repo.** Until it is, the passport
-  is incomplete against `AGENTS.md` §5.7 and the artifact must not be
-  redistributed outside the lab.
+- **Upstream base is `qwen-research`, NON-COMMERCIAL only** — verified 2026-08-08
+  against the official model card, see [`../../docs/BASE-LICENSE.md`](../../docs/BASE-LICENSE.md).
+  Apache-2.0 was recorded here before and was wrong. Every artifact below is a
+  derivative work of that base and inherits the restriction: research and
+  evaluation are granted, shipping one to a paying pilot is not. Lifting this
+  needs either a locked-base move to 7B/14B (both Apache-2.0) or a commercial
+  licence from Alibaba Cloud — a human decision under `AGENTS.md` §9.
 - Not a frontier chat model, not an agent runtime, not Mid/7–14B. Trained on
   lab-synthetic and curated data only — no customer personal data.
 

@@ -8,7 +8,7 @@
 | **Base model** | Qwen2.5-3B-Instruct |
 | **PII** | none — synthetic only |
 | **LICENSE of this set** | CC0-equivalent synthetic (Outpost Neurolab) |
-| **Upstream base LICENSE** | Apache-2.0 (Qwen) — unchanged |
+| **Upstream base LICENSE** | `qwen-research` — NON-COMMERCIAL only, unchanged by this set. Не Apache-2.0: [`../docs/BASE-LICENSE.md`](../docs/BASE-LICENSE.md) |
 
 ## Files
 

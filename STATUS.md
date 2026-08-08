@@ -17,6 +17,9 @@
 | **Pilot chat** | pack + smoke green (`PILOT-CONTOUR-CHAT.md`) |
 | **Agent-eval** | **LIVE hn + agent_format · 20/20** (`:8102`) |
 | **Synapse bridge** | **v0.3** · Gate ADR-054 · **pilot-contour-gate ON** (:8097) · smoke 3/3 · SOW Approved |
+| **Eval scorer** | `scripts/score_agent_eval.py` · 55/60 совпадений с ручной оценкой · repeats |
+| **CI / gate** | GitHub Actions + `scripts/gate.sh` (6 шагов) · 85 sandbox + 56 root tests |
+| **⚠️ Base LICENSE** | **`qwen-research` — NON-COMMERCIAL only** ([`docs/BASE-LICENSE.md`](docs/BASE-LICENSE.md)) · блокирует коммерческую поставку весов · решение человека |
 
 ### Ladder
 
@@ -32,18 +35,48 @@ Runtime: Commercial Outpost `[contour_guard] enabled = true`
 
 ## Next
 
-1. **Eval scorer + variance** — `scripts/score_agent_eval.py`: 6 of 10 ids are
-   mechanically checkable from the rubric; then temperature 0, 5 repeats,
-   report mean±stdev. Until then ±1 deltas are noise, not signal.
-2. **Un-ignore eval raw evidence** (`all.jsonl` + `meta.json`) so scores in
-   `eval/results/*.md` are re-verifiable — land it with the scorer.
-3. Pause Tiny LoRA sheet chase  
-4. (optional) richer D4 fronts / Chip PDK-adjacent later  
+1. **Решение по базе (человек, блокер).** База под `qwen-research`, non-commercial;
+   производные — наши LoRA-merge и пилотный GGUF. Варианты и цена — в
+   [`docs/BASE-LICENSE.md`](docs/BASE-LICENSE.md) §5. Переход на 7B/14B (Apache-2.0)
+   снимает вопрос и уже есть в `docs/SCALE-PLAN.md`; смена locked base = ADR + человек.
+2. **Свести три предложенных ADR** в `docs/DECISIONS.md` (единый источник фокуса,
+   конверт метрик, «наружу только из CLAIMS.md») — номера с NL-ADR-025, треки F и G
+   оба просили 025.
+3. **Перепрогнать лист 20/20 с сохранением сырья** — нужен Metal-хост; сейчас
+   каталог сырых ответов флагманского прогона пуст (C-05).
+4. **§ Proof points в `docs/INVESTOR-NORTH-STAR.md`** — переписать по `docs/CLAIMS.md`;
+   формулировки наружу = решение человека (`AGENTS.md` §9).
+5. Дубль `outpost-tiny-hammer2.Q4_K_M.gguf` — удалить или описать как алиас (C-01).
+6. Pause Tiny LoRA sheet chase · (optional) richer D4 fronts / Chip PDK-adjacent later
+
+Сделано этой волной (было пунктами 1–2): автоскорер с повторами и открытое
+машиночитаемое сырьё — трек E.
 
 ## Session log
 
 > Записи старше 2026-08-01 — в архиве [`docs/SESSIONS-2026-07.md`](docs/SESSIONS-2026-07.md)
 > (перенесены 2026-08-08 без изменения текста).
+
+### 2026-08-08 — Base LICENSE: не Apache-2.0 (проверено по первоисточнику)
+
+- Трек H заметил, что upstream LICENSE не зафиксирована нигде в репозитории.
+  Проверка по официальной карточке `Qwen/Qwen2.5-3B-Instruct` дала однозначный
+  ответ: `license: other`, `license_name: qwen-research`, текст —
+  **«FOR NON-COMMERCIAL PURPOSES ONLY»**, где Non-Commercial = research or
+  evaluation only, а коммерческое использование требует отдельной лицензии
+  Alibaba Cloud. **Записанное у нас «Apache-2.0» было неверным.**
+- Почему это не документационная мелочь: §2.a лицензии покрывает производные
+  работы. Наши LoRA-merge и GGUF — производные, включая пилотный `hammer`.
+  Передача весов платящему пилоту не попадает в research/evaluation.
+- 3B — исключение в линейке: 0.5B/1.5B/7B/14B/32B под Apache-2.0. То есть переход
+  locked base на 7B/14B снимает вопрос целиком и уже стоит в `SCALE-PLAN` как Mid.
+- Исправлено: новый [`docs/BASE-LICENSE.md`](docs/BASE-LICENSE.md) (факт, последствие,
+  три варианта с ценой), ложные Apache-2.0 в `datasets/base-qwen25-3b.md` и
+  `datasets/manifest-tiny-lora-v0.md`, паспорт перегенерирован, C-53 в `CLAIMS.md`
+  переписана, в §7 добавлен запрет заявлять право коммерческой поставки весов.
+- Verify: `rg -i apache datasets/ models/` → ложных утверждений о базе нет;
+  `python3 scripts/gen_model_card.py --check`; `bash scripts/gate.sh` → PASS.
+- Решение за человеком (`AGENTS.md` §9): 7B/14B, запрос лицензии, или research-only.
 
 ### 2026-08-08 — One source of truth + STATUS rotation (brief G)
 
