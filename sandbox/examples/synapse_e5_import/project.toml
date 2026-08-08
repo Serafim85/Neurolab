@@ -1,0 +1,35 @@
+[project]
+id = "synapse-e5-import"
+name = "Synapse E5 escalate metrics (import)"
+version = "0.1.0"
+domain = "synapse_import"
+
+[import]
+pack = "e5-brain-escalate"
+source = "fixtures/e5-official.json"
+
+[network]
+# Declarative placeholders — real topology lives in Synapse pack
+kind = "synapse_export"
+n_neurons = 0
+n_synapses = 0
+
+[budget]
+# Host wrap: no SNN budget; keep ceilings high so import stays budget_ok
+max_neurons = 1000000
+max_synapses = 1000000
+max_spikes_per_sample = 1000000
+
+[task]
+kind = "import_metrics"
+metric_primary = "accuracy"
+
+[sandbox]
+scenarios = ["official_bench"]
+seed = 0
+
+[contour]
+ask_enabled = true
+provider = "local"
+base_url = "http://127.0.0.1:8098/v1"
+model = "outpost-tiny-hammer"

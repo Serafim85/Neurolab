@@ -1,0 +1,38 @@
+[project]
+id = "anomaly-v0"
+name = "Vibration anomaly SNN"
+version = "0.1.0"
+domain = "snn_lif"
+
+[network]
+kind = "snn_lif"
+n_inputs = 16
+n_hidden = 64
+n_outputs = 2
+neuron = "lif"
+dt_ms = 1.0
+sim_steps = 24
+
+[budget]
+max_neurons = 128
+max_synapses = 4096
+max_spikes_per_sample = 5000
+
+[task]
+kind = "binary_anomaly"
+dataset = "data"
+metric_primary = "f1"
+
+[sandbox]
+scenarios = ["nominal", "anomaly", "noise"]
+seed = 42
+
+[contour]
+ask_enabled = true
+provider = "local"
+base_url = "http://127.0.0.1:8090/v1"
+model = "outpost-tiny-hammer"
+# provider = "public"
+# base_url = "https://api.openai.com/v1"
+# model = "gpt-4o-mini"
+# api_key_env = "CLOSED_SANDBOX_LLM_API_KEY"

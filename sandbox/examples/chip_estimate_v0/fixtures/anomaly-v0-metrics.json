@@ -1,0 +1,13 @@
+{
+  "project_id": "anomaly-v0",
+  "domain": "snn_lif",
+  "f1": 0.8947,
+  "accuracy": 0.9,
+  "spike_count": 328,
+  "synops": 6057,
+  "latency_proxy_ms": 24.0,
+  "budget_ok": true,
+  "n_neurons": 66,
+  "n_synapses": 1152,
+  "seed": 42
+}

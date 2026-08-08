@@ -1,0 +1,38 @@
+[project]
+id = "chip-fpga-lite-v0"
+name = "FPGA SNN lite estimate (fpga_snn_lite_v0)"
+version = "0.1.0"
+domain = "neuro_chip"
+
+[network]
+kind = "neuro_chip"
+n_inputs = 16
+n_hidden = 64
+n_outputs = 2
+
+[chip]
+target = "fpga_snn_lite_v0"
+source_metrics = "../chip_estimate_v0/fixtures/anomaly-v0-metrics.json"
+
+[budget]
+max_neurons = 128
+max_synapses = 4096
+max_spikes_per_sample = 5000
+# FPGA footprint / board proxy — looser than ASIC-style generic target
+max_chip_power_mw = 2500.0
+max_chip_area_mm2 = 500.0
+max_chip_luts = 200000
+
+[task]
+kind = "chip_estimate"
+metric_primary = "chip_fit_score"
+
+[sandbox]
+scenarios = ["nominal", "high_activity", "sparse"]
+seed = 42
+
+[contour]
+ask_enabled = true
+provider = "local"
+base_url = "http://127.0.0.1:8090/v1"
+model = "outpost-tiny-hammer"

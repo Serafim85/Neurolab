@@ -1,0 +1,41 @@
+[project]
+id = "hybrid-ecg-snn-v0"
+name = "Hybrid: synthetic ECG front → SNN LIF backend"
+version = "0.1.0"
+domain = "hybrid"
+
+[front]
+kind = "synthetic_ecg_v0"
+encode = "threshold"
+n_channels = 1
+n_samples = 128
+threshold = 0.45
+n_train = 40
+n_test = 20
+
+[backend]
+kind = "snn_lif"
+n_hidden = 24
+n_outputs = 2
+sim_steps = 16
+
+[budget]
+max_channels = 4
+max_samples = 512
+max_spikes_per_sample = 5000
+max_neurons = 64
+max_synapses = 4096
+
+[task]
+kind = "hybrid_rhythm"
+metric_primary = "f1"
+
+[sandbox]
+scenarios = ["clean", "arrhythmia", "noisy"]
+seed = 42
+
+[contour]
+ask_enabled = true
+provider = "local"
+base_url = "http://127.0.0.1:8090/v1"
+model = "outpost-tiny-hammer"
