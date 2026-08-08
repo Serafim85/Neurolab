@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import os
 import subprocess
+import sys
 from pathlib import Path
+from types import ModuleType
 
 import pytest
 
@@ -16,6 +18,20 @@ from outpost_util import (
     port_open,
     wait_health,
 )
+
+
+@pytest.fixture()
+def register_domain(monkeypatch: pytest.MonkeyPatch):
+    """Expose a test-only domain plugin to `engine._load_plugin` (auto-removed)."""
+
+    def _register(mod: ModuleType) -> str:
+        domain_id = mod.DOMAIN_ID
+        monkeypatch.setitem(
+            sys.modules, f"closed_sandbox.domains.{domain_id}", mod
+        )
+        return domain_id
+
+    return _register
 
 
 @pytest.fixture(scope="session")

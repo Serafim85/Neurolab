@@ -26,6 +26,12 @@ max_chip_area_mm2 = 25.0
 kind = "chip_estimate"
 metric_primary = "chip_fit_score"
 
+[economy]
+# Generic cost proxy: quality_per_unit_cost = chip_fit_score / chip_power_mw.
+# Estimated power, not measured silicon (see chip_estimate_disclaimer).
+cost_key = "chip_power_mw"
+cost_unit = "mW"
+
 [sandbox]
 scenarios = ["nominal", "high_activity", "sparse"]
 seed = 42

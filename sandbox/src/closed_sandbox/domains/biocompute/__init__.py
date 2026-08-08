@@ -13,6 +13,9 @@ import numpy as np
 from closed_sandbox.manifest import ManifestError
 
 DOMAIN_ID = "biocompute"
+# Not a spiking domain: spike_count stays 0 by design (see contour_ask facts),
+# so the core must not demand the SNN cost keys from it.
+METRICS_FAMILY = "generic"
 
 _KINDS = ("boolean_grn_v0",)
 

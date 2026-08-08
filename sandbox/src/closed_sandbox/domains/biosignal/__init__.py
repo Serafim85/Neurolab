@@ -13,6 +13,7 @@ from closed_sandbox.domains.snn_lif.lif import LIFLayer, LIFParams
 from closed_sandbox.manifest import ManifestError
 
 DOMAIN_ID = "biosignal"
+METRICS_FAMILY = "snn"
 
 _KINDS = ("synthetic_ecg_v0", "synthetic_eeg_v0")
 _ENCODERS = ("threshold",)

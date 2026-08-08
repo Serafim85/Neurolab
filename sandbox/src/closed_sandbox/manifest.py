@@ -47,6 +47,20 @@ def validate_project(project: dict[str, Any]) -> None:
     if "scenarios" not in sandbox:
         sandbox["scenarios"] = ["nominal", "anomaly", "noise"]
 
+    if "economy" not in project:
+        project["economy"] = {}
+    economy = project["economy"]
+    if not isinstance(economy, dict):
+        raise ManifestError("[economy] must be a table")
+    cost_key = economy.get("cost_key")
+    if cost_key is not None and (not isinstance(cost_key, str) or not cost_key.strip()):
+        raise ManifestError(
+            "[economy].cost_key must be a non-empty string naming a numeric metrics key"
+        )
+    cost_unit = economy.get("cost_unit")
+    if cost_unit is not None and not isinstance(cost_unit, str):
+        raise ManifestError("[economy].cost_unit must be a string (display label)")
+
     if "contour" not in project:
         project["contour"] = {}
     contour = project["contour"]

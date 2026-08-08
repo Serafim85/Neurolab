@@ -13,6 +13,7 @@ if _HAS_NUMPY:
     import numpy as np
 
 DOMAIN_ID = "snn_lif"
+METRICS_FAMILY = "snn"
 
 
 def validate_project(project: dict[str, Any]) -> None:

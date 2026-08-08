@@ -19,6 +19,7 @@ from closed_sandbox.domains.snn_lif.lif import LIFLayer, LIFParams
 from closed_sandbox.manifest import ManifestError
 
 DOMAIN_ID = "hybrid"
+METRICS_FAMILY = "snn"
 
 _BACKENDS = ("snn_lif",)
 _ENCODERS = ("threshold",)

@@ -1,0 +1,88 @@
+{
+  "changed": {
+    "accuracy": {
+      "a": 0.7619,
+      "b": 0.8571,
+      "delta": 0.09519999999999995
+    },
+    "by_scenario": {
+      "a": {
+        "anomaly": {
+          "accuracy": 0.9286,
+          "f1": 0.9231,
+          "n": 14,
+          "spike_count": 323,
+          "synops": 5990
+        },
+        "noise": {
+          "accuracy": 0.5714,
+          "f1": 0.5714,
+          "n": 14,
+          "spike_count": 328,
+          "synops": 6074
+        },
+        "nominal": {
+          "accuracy": 0.7857,
+          "f1": 0.7273,
+          "n": 14,
+          "spike_count": 329,
+          "synops": 6003
+        }
+      },
+      "b": {
+        "anomaly": {
+          "accuracy": 0.8571,
+          "f1": 0.8333,
+          "n": 14,
+          "spike_count": 377,
+          "synops": 6855
+        },
+        "noise": {
+          "accuracy": 0.7857,
+          "f1": 0.7692,
+          "n": 14,
+          "spike_count": 331,
+          "synops": 6082
+        },
+        "nominal": {
+          "accuracy": 0.9286,
+          "f1": 0.9231,
+          "n": 14,
+          "spike_count": 376,
+          "synops": 6903
+        }
+      }
+    },
+    "f1": {
+      "a": 0.7368,
+      "b": 0.8421,
+      "delta": 0.10529999999999995
+    },
+    "quality_per_kspike": {
+      "a": 2.253211,
+      "b": 2.332687,
+      "delta": 0.0794760000000001
+    },
+    "quality_per_ksynop": {
+      "a": 0.122351,
+      "b": 0.12734,
+      "delta": 0.004989000000000007
+    },
+    "seed": {
+      "a": 42,
+      "b": 43,
+      "delta": 1
+    },
+    "spike_count": {
+      "a": 327,
+      "b": 361,
+      "delta": 34
+    },
+    "synops": {
+      "a": 6022,
+      "b": 6613,
+      "delta": 591
+    }
+  },
+  "n_changed": 8
+}

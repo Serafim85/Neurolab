@@ -1,0 +1,45 @@
+{
+  "f1": 0.8421,
+  "accuracy": 0.8571,
+  "spike_count": 361,
+  "synops": 6613,
+  "latency_proxy_ms": 24.0,
+  "budget_ok": true,
+  "n_neurons": 66,
+  "n_synapses": 1152,
+  "n_test": 42,
+  "samples_over_spike_budget": 0,
+  "metric_primary": "f1",
+  "train_epochs": 20,
+  "train_epochs_ran": 20,
+  "n_train": 120,
+  "backend": "numpy",
+  "by_scenario": {
+    "nominal": {
+      "n": 14,
+      "f1": 0.9231,
+      "accuracy": 0.9286,
+      "spike_count": 376,
+      "synops": 6903
+    },
+    "anomaly": {
+      "n": 14,
+      "f1": 0.8333,
+      "accuracy": 0.8571,
+      "spike_count": 377,
+      "synops": 6855
+    },
+    "noise": {
+      "n": 14,
+      "f1": 0.7692,
+      "accuracy": 0.7857,
+      "spike_count": 331,
+      "synops": 6082
+    }
+  },
+  "by_scenario_mode": "split",
+  "wall_ms": 0.0,
+  "domain": "snn_lif",
+  "seed": 43,
+  "project_id": "anomaly-v0"
+}

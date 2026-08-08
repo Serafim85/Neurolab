@@ -13,6 +13,9 @@ from typing import Any
 from closed_sandbox.manifest import ManifestError
 
 DOMAIN_ID = "synapse_import"
+# Host wrapper, not a simulator: strictness for imported KPIs lives in
+# _REQUIRED_SOURCE below, checked against the source fixture itself.
+METRICS_FAMILY = "generic"
 
 _REQUIRED_SOURCE = ("accuracy", "spike_count", "synops")
 

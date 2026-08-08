@@ -13,6 +13,7 @@ from typing import Any
 from closed_sandbox.manifest import ManifestError
 
 DOMAIN_ID = "neuro_chip"
+METRICS_FAMILY = "snn"
 
 # Named targets — order-of-magnitude lab proxies only (NL-ADR-020/021).
 # Not vendor datasheets; not bitstream / SDK builds.
