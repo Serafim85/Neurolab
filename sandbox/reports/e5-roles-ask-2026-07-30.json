@@ -1,0 +1,43 @@
+{
+  "date": "2026-07-30",
+  "bridge": "v0.2",
+  "turns": [
+    {
+      "q": "Who fixes class_id on escalate rows \u2014 stage_vote or the LLM? One sentence.",
+      "a": "Synapse stage_vote fixes class_id on escalate rows."
+    },
+    {
+      "q": "Why is escalate_rate ~7% not 100%? Is escalate another SNN call?",
+      "a": " escalate_rate = 6.82% is the fraction of uncertain rows that are escalated for further processing, not another SNN. It does not relate to the accuracy of the current model. oracle_accuracy = 89.02% is the lab ceiling if all uncertain rows were handled perfectly."
+    },
+    {
+      "q": "What is oracle_accuracy 0.89 \u2014 product KPI or lab ceiling?",
+      "a": "oracle_accuracy = 0.8902 is the lab ceiling (NOT a product KPI)."
+    }
+  ],
+  "metrics": {
+    "accuracy": 0.8598,
+    "f1": 0.8598,
+    "spike_count": 0,
+    "synops": 0,
+    "latency_proxy_ms": 1.33,
+    "budget_ok": true,
+    "n_neurons": 0,
+    "n_synapses": 0,
+    "metric_primary": "accuracy",
+    "import_source": "/Users/valentin/Projects/neurolab/sandbox/examples/synapse_e5_import/fixtures/e5-official.json",
+    "synapse_pack": "e5-brain-escalate",
+    "escalate_rate": 0.0682,
+    "oracle_accuracy": 0.8902,
+    "class_fix": "stage_vote",
+    "brain_role": "explain_plan",
+    "stub_accuracy": 0.8561,
+    "stage_vote_accuracy": 0.8598,
+    "bridge_version": "0.2.0",
+    "notes": "Roles v0.2: class_fix=stage_vote (+0.37 pp vs stub); Outpost=explain/plan only. spike/synops N/A host wrap. oracle_accuracy lab upper bound.",
+    "seed": 0,
+    "wall_ms": 0.208,
+    "domain": "synapse_import",
+    "project_id": "synapse-e5-import"
+  }
+}

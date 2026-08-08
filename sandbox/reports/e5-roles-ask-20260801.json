@@ -1,0 +1,36 @@
+{
+  "date": "2026-08-01",
+  "bridge_version": "0.3.0",
+  "class_fix": "specialist",
+  "metrics": {
+    "accuracy": 0.8636,
+    "specialist_accuracy": 0.8636,
+    "stage_vote_accuracy": 0.8598,
+    "stub_accuracy": 0.8561,
+    "oracle_accuracy": 0.8902,
+    "escalate_rate": 0.0682,
+    "class_fix": "specialist",
+    "brain_role": "explain_plan",
+    "bridge_version": "0.3.0"
+  },
+  "turns": [
+    {
+      "id": "class_id",
+      "q": "Who fixes class_id on escalate rows — specialist or the LLM? One sentence.",
+      "a": "Synapse specialist fixes class_id on escalate rows.",
+      "verdict": "✅"
+    },
+    {
+      "id": "escalate_rate",
+      "q": "Why is escalate_rate about 7%? Is that another SNN? One sentence.",
+      "a": "escalate_rate of 7% refers to the fraction of uncertain rows handled by the Synapse specialist, not another SNN.",
+      "verdict": "✅"
+    },
+    {
+      "id": "oracle",
+      "q": "Is oracle_accuracy 0.89 a product KPI or a lab ceiling? One sentence.",
+      "a": "oracle_accuracy = 0.8902 is a lab ceiling (not a product KPI).",
+      "verdict": "✅"
+    }
+  ]
+}

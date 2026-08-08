@@ -1,0 +1,19 @@
+{
+  "accuracy": 0.9,
+  "budget_ok": true,
+  "domain": "snn_lif",
+  "f1": 0.8947,
+  "latency_proxy_ms": 24.0,
+  "metric_primary": "f1",
+  "n_neurons": 66,
+  "n_synapses": 1152,
+  "n_test": 40,
+  "n_train": 120,
+  "project_id": "anomaly-v0",
+  "samples_over_spike_budget": 0,
+  "seed": 1,
+  "spike_count": 332,
+  "synops": 6119,
+  "train_epochs": 20,
+  "wall_ms": 7012.599
+}

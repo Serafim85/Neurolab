@@ -1,0 +1,52 @@
+{
+  "after": {
+    "accuracy": 0.8561,
+    "budget_ok": true,
+    "escalate_rate": 0.0682,
+    "f1": 0.8561,
+    "latency_proxy_ms": 0.4906,
+    "oracle_accuracy": 0.8902,
+    "spike_count": 0,
+    "synops": 0
+  },
+  "before": {
+    "accuracy": 0.856,
+    "budget_ok": true,
+    "escalate_rate": 0.068,
+    "f1": 0.856,
+    "latency_proxy_ms": 0.44,
+    "oracle_accuracy": 0.89,
+    "spike_count": 0,
+    "synops": 0
+  },
+  "diff": {
+    "changed": {
+      "accuracy": {
+        "a": 0.856,
+        "b": 0.8561,
+        "delta": 9.999999999998899e-05
+      },
+      "escalate_rate": {
+        "a": 0.068,
+        "b": 0.0682,
+        "delta": 0.00019999999999999185
+      },
+      "f1": {
+        "a": 0.856,
+        "b": 0.8561,
+        "delta": 9.999999999998899e-05
+      },
+      "latency_proxy_ms": {
+        "a": 0.44,
+        "b": 0.4906,
+        "delta": 0.05059999999999998
+      },
+      "oracle_accuracy": {
+        "a": 0.89,
+        "b": 0.8902,
+        "delta": 0.00019999999999997797
+      }
+    },
+    "n_changed": 5
+  }
+}

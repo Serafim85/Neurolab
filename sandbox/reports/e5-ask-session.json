@@ -1,0 +1,44 @@
+{
+  "provider": {
+    "ask_enabled": true,
+    "provider": "local",
+    "base_url": "http://127.0.0.1:8098/v1",
+    "model": "outpost-tiny-hammer",
+    "api_key_env": "CLOSED_SANDBOX_LLM_API_KEY"
+  },
+  "metrics": {
+    "accuracy": 0.856,
+    "budget_ok": true,
+    "domain": "synapse_import",
+    "escalate_rate": 0.068,
+    "f1": 0.856,
+    "import_source": "/Users/valentin/Projects/neurolab/sandbox/examples/synapse_e5_import/fixtures/e5-official.json",
+    "latency_proxy_ms": 0.44,
+    "metric_primary": "accuracy",
+    "n_neurons": 0,
+    "n_synapses": 0,
+    "notes": "Frozen official CARD bench (portable cascade). spike/synops N/A for host wrap — zeros. escalate_rate under hard_or_low_score. Not a live torch run.",
+    "oracle_accuracy": 0.89,
+    "project_id": "synapse-e5-import",
+    "seed": 0,
+    "spike_count": 0,
+    "synapse_pack": "e5-brain-escalate",
+    "synops": 0,
+    "wall_ms": 0.374
+  },
+  "turns": [
+    {
+      "q": "По метрикам: accuracy 0.856 и escalate_rate 0.068. Почему выгоднее звать мозг только на ~7% строк, а не всегда? Ответ до 80 слов.",
+      "a": "Потому что 6.8% — это допустимый лимит для уточнения, минимизируя SNN. Меньше — выше точность."
+    },
+    {
+      "q": "Что означает oracle_accuracy 0.89 относительно accuracy 0.856 в этом отчёте? Это продукт или верхняя оценка? До 80 слов.",
+      "a": "oracle_accuracy 0.89 — верхняя оценка от внешнего умного устройства (не продукт KPI). Было 0.856. Уровень 80% — допустимый для проекта."
+    },
+    {
+      "q": "budget_ok true, spike_count 0, synops 0 — как инженеру читать эти поля для pack e5-brain-escalate (host wrap)? До 80 слов.",
+      "a": "Читать: budget_ok — true, spike_count/synops — 0. Пак для host wrap, нет live run. Окей для внешнего утверждения."
+    }
+  ],
+  "prompt": "synapse_import-aware"
+}

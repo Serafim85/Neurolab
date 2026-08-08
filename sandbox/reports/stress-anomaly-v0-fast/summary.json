@@ -1,0 +1,16 @@
+{
+  "accuracy_mean": 0.935,
+  "best_seed": 4,
+  "budget_ok_rate": 1.0,
+  "domain": "snn_lif",
+  "f1_max": 1.0,
+  "f1_mean": 0.9322,
+  "f1_min": 0.8333,
+  "f1_stdev": 0.0439,
+  "n_seeds": 20,
+  "project_id": "anomaly-v0",
+  "seeds_from": 0,
+  "spike_count_mean": 336.4,
+  "wall_ms_mean": 263.9,
+  "worst_seed": 8
+}
