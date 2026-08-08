@@ -1,6 +1,6 @@
 # Neurolab STATUS
 
-**Last updated:** 2026-08-05
+**Last updated:** 2026-08-08
 
 ## Summary
 
@@ -28,10 +28,36 @@ Runtime: Commercial Outpost `[contour_guard] enabled = true`
 
 ## Next
 
-1. Pause Tiny LoRA sheet chase  
-2. (optional) richer D4 fronts / Chip PDK-adjacent later  
+1. **Eval scorer + variance** — `scripts/score_agent_eval.py`: 6 of 10 ids are
+   mechanically checkable from the rubric; then temperature 0, 5 repeats,
+   report mean±stdev. Until then ±1 deltas are noise, not signal.
+2. **Un-ignore eval raw evidence** (`all.jsonl` + `meta.json`) so scores in
+   `eval/results/*.md` are re-verifiable — land it with the scorer.
+3. Refresh stale sheets: `CLOSED-SANDBOX-VERIFY.md` + MVP §9 say 11 passed,
+   actual is **51**. Make `AGENTS.md` §6 / `ARCHITECTURE.md` §6 point at this
+   file instead of duplicating focus.
+4. Pause Tiny LoRA sheet chase  
+5. (optional) richer D4 fronts / Chip PDK-adjacent later  
 
 ## Session log
+
+### 2026-08-08 — Repo audit + first push in 3 weeks
+
+- **Root risk closed:** last commit was 2026-07-19 while the log ran to 08-05 —
+  4610 py LOC of `sandbox/`, all Closed Sandbox docs, eval and datasets sat
+  uncommitted in a repo with **no remote**. Now 14 thematic commits pushed to
+  `git@github.com:Serafim85/Neurolab.git`
+- **Silent data loss found:** the hand-maintained `.gitignore` dataset allowlist
+  had stopped being updated, excluding `tiny-lora-hammer2` (the flagship GGUF's
+  training data), `hammer`, `hammer3`, `agent` and `eval/prompts/agent-v0.jsonl`.
+  Replaced with rules — a new dataset now needs no `.gitignore` edit
+- **Ritual hole closed:** session end asked for `STATUS.md` but never for a
+  commit. `AGENTS.md` §4 + Cursor rule 12 now require clean `git status` + push
+- Audit verdict: strengths are layer boundaries (`engine.py` 88 lines, no domain
+  formulas across D0–D4), real tests (51 unit / 1342 test LOC), recorded negative
+  results, mandatory proxy disclaimers. Weakness is measurement — see §Next 1–2
+- Verify: `cd sandbox && PYTHONPATH=src python -m pytest -q -m "not integration"`
+  → **51 passed**; `git status` clean; `git log origin/master` = 14 commits
 
 ### 2026-08-05 — Real by_scenario splits D1–D4
 
