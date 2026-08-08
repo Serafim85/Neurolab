@@ -1,0 +1,25 @@
+# Agent LoRA mixed pack (plan+budget+strong self_check). Continue from hn.
+# Port 8097 · guard OFF · orthogonal to pilot 20/20.
+[server]
+host = "127.0.0.1"
+port = 8097
+
+[models]
+dir = "/Users/valentin/Projects/neurolab/artifacts"
+active = "outpost-tiny-agent-mix"
+path = "/Users/valentin/Projects/neurolab/artifacts/outpost-tiny-agent-mix.Q4_K_M.gguf"
+
+[inference]
+memory_limit_mb = 6144
+threads = 4
+context_size = 4096
+chat_template = "chatml"
+system_prompt = ""
+
+[audit]
+enabled = true
+log_path = "/Users/valentin/Projects/neurolab/artifacts/agent-mix-audit.jsonl"
+log_prompt_content = false
+
+[contour_guard]
+enabled = false

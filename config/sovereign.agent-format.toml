@@ -1,0 +1,29 @@
+# Agent-eval live: hn GGUF + [agent_format] v2 → target 20/20 on agent-v0.
+# Port 8101 · contour_guard OFF · agent_format ON.
+# Orthogonal to pilot hammer2+guard 20/20 (prompts.ru).
+[server]
+host = "127.0.0.1"
+port = 8102
+
+[models]
+dir = "/Users/valentin/Projects/neurolab/artifacts"
+active = "outpost-tiny-agent-hn"
+path = "/Users/valentin/Projects/neurolab/artifacts/outpost-tiny-agent-hn.Q4_K_M.gguf"
+
+[inference]
+memory_limit_mb = 6144
+threads = 4
+context_size = 4096
+chat_template = "chatml"
+system_prompt = ""
+
+[audit]
+enabled = true
+log_path = "/Users/valentin/Projects/neurolab/artifacts/agent-format-live-audit.jsonl"
+log_prompt_content = false
+
+[contour_guard]
+enabled = false
+
+[agent_format]
+enabled = true

@@ -1,0 +1,26 @@
+[server]
+host = "127.0.0.1"
+port = 8096
+
+# Pilot / demo bar: hammer2 GGUF (~1.8G, not in git) + contour_guard → 20/20
+# See docs/PILOT-CONTOUR-CHAT.md
+[models]
+dir = "/Users/valentin/Projects/neurolab/artifacts"
+active = "outpost-tiny-hammer"
+path = "/Users/valentin/Projects/neurolab/artifacts/outpost-tiny-hammer.Q4_K_M.gguf"
+
+[inference]
+memory_limit_mb = 6144
+threads = 4
+context_size = 4096
+chat_template = "chatml"
+system_prompt = ""
+
+[audit]
+enabled = true
+log_path = "/Users/valentin/Projects/neurolab/artifacts/tiny-hammer-audit.jsonl"
+log_prompt_content = false
+
+# Commercial ADR-047 — requires rebuilt sovereignd with contour_guard
+[contour_guard]
+enabled = true

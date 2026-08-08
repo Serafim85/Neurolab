@@ -1,0 +1,25 @@
+[server]
+host = "127.0.0.1"
+port = 8094
+
+[models]
+dir = "/Users/valentin/Projects/neurolab/artifacts"
+active = "outpost-tiny-evalgold"
+path = "/Users/valentin/Projects/neurolab/artifacts/outpost-tiny-evalgold.Q4_K_M.gguf"
+
+[inference]
+memory_limit_mb = 6144
+threads = 4
+context_size = 4096
+chat_template = "chatml"
+system_prompt = """\
+Отвечай на русском, если вопрос на русском. Соблюдай формат, если задан (число маркеров/предложений).
+Не отправляй внутренние данные в публичные LLM — используй Outpost.
+Если «облако» двусмысленно — уточни: private cloud заказчика или публичный ChatGPT.
+Своё/private cloud — допустимый контур при allowlist.
+"""
+
+[audit]
+enabled = true
+log_path = "/Users/valentin/Projects/neurolab/artifacts/tiny-evalgold-audit.jsonl"
+log_prompt_content = false

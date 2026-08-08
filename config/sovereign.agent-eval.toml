@@ -1,0 +1,27 @@
+# Brief C — agent-format baseline (hammer2 model-only).
+# Port 8097: avoid pilot :8096 and sandbox-ask :8098.
+# contour_guard OFF on purpose — measure model formats, not ADR-047 paths.
+# Do not use this config for Brief B pilot demo story.
+[server]
+host = "127.0.0.1"
+port = 8097
+
+[models]
+dir = "/Users/valentin/Projects/neurolab/artifacts"
+active = "outpost-tiny-hammer"
+path = "/Users/valentin/Projects/neurolab/artifacts/outpost-tiny-hammer.Q4_K_M.gguf"
+
+[inference]
+memory_limit_mb = 6144
+threads = 4
+context_size = 4096
+chat_template = "chatml"
+system_prompt = ""
+
+[audit]
+enabled = true
+log_path = "/Users/valentin/Projects/neurolab/artifacts/agent-eval-audit.jsonl"
+log_prompt_content = false
+
+[contour_guard]
+enabled = false

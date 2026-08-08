@@ -1,0 +1,26 @@
+# Agent LoRA eval (hammer2 → tiny-lora-agent f32).
+# Port 8097: same as agent-eval baseline; guard OFF.
+# Orthogonal to pilot hammer2+guard 20/20.
+[server]
+host = "127.0.0.1"
+port = 8097
+
+[models]
+dir = "/Users/valentin/Projects/neurolab/artifacts"
+active = "outpost-tiny-agent"
+path = "/Users/valentin/Projects/neurolab/artifacts/outpost-tiny-agent.Q4_K_M.gguf"
+
+[inference]
+memory_limit_mb = 6144
+threads = 4
+context_size = 4096
+chat_template = "chatml"
+system_prompt = ""
+
+[audit]
+enabled = true
+log_path = "/Users/valentin/Projects/neurolab/artifacts/agent-lora-audit.jsonl"
+log_prompt_content = false
+
+[contour_guard]
+enabled = false
