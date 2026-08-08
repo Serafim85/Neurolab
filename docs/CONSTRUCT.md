@@ -45,7 +45,7 @@ construct.toml ◄──────────────────── h
 
 1. **Slot, not monolith** — единица эволюции = слот (`chat`, `extract`, …), не «весь мозг».
 2. **Declarative first** — состав и политики в манифесте; код Outpost читает манифест.
-3. **Capability tags** — слот объявляет `skills = ["json", "ru_chat"]`; router и автоподстройка опираются на tags, не на хардкод имён.
+3. **Capability tags** — слот объявляет `skills = ["json", "ru_chat"]`; router и автоподстройка опираются на tags, не на хардкод имён. Agent-format tags (future, catalog only — no runtime in Lab): `tool_json`, `plan`, `schema_json`, `router_label`, `contour_refuse`, `format_budget`, `self_check`, `code_lite` — see `eval/agent-rubric.md`.
 4. **Hardware profiles** — именованные профили (`branch_8gb`, `dept_32gb`, `dc_gpu`); выбор вручную или auto.
 5. **Degrade gracefully** — нет слота / мало RAM → fallback на `default` слот, не падение всего сервиса.
 6. **Measure** — каждый слот со своим eval slice; конструкт versioned.
@@ -140,6 +140,11 @@ detect: ram_mb, cpu_threads, gpu_vram_mb (если есть)
 | Audit событий | — | ✅ |
 
 Пока Gate B не готов: construct = **документированный контракт + пример**; Lab живёт с `chat`-only, Outpost — single GGUF.
+
+### 6.1 Synapse (bio) junction
+
+Cross-lab contract with Synapse L0/L1 ensembles: **`docs/SYNAPSE-BRIDGE.md`** (pointer) → Synapse SoT `BRAIN-BRIDGE.md` (SYN-ADR-008).  
+Sensor escalate / energy proxies stay in Synapse; Construct still owns `chat`/tool routing. No `external_ensemble` skill in schema v0.1 yet.
 
 ---
 

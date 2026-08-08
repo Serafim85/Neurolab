@@ -20,6 +20,8 @@
 Не масштабируем размер, пока не выжали качество с текущего.
 
 **Min resource → max result:** сначала данные и LoRA, потом параметры; железо режет активные слоты через profiles.
+
+**North star (NL-ADR-019):** рост до Mid/Large/MoE и optional cloud/public client — чтобы **перекрыть** нужные capability frontier **своей** линейкой + Synapse, не чтобы стать копией Kimi/Grok. Экономия ресурсов (science + Construct) — часть успеха, не только размер. См. [`STRATEGY.md`](STRATEGY.md).
 ---
 
 ## 2. Уровни (L)

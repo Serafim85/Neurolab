@@ -2,7 +2,8 @@
 
 > **Статус:** living canon (NL-ADR-007) · обновлять при крупных сдвигах поля  
 > **Для кого:** агенты и human перед train/arch решениями  
-> **Фильтр:** не «всё про DL», а то, что усиливает **offline / contour / Construct / min→max**
+> **Фильтр:** не «всё про DL», а то, что усиливает **offline / contour / Construct / min→max**  
+> **Соседний канон:** мозгоподобные / SNN студия → [`CLOSED-SANDBOX-CANON.md`](CLOSED-SANDBOX-CANON.md) (не смешивать с dense Tiny)
 
 ---
 
@@ -31,8 +32,11 @@
 | **Interpretability & auditability** | Anthropic SAE / circuits | для госа: паспорт, eval, отказ от «чёрного ящика» в поставке |
 | **Local inference stack** | llama.cpp / GGUF ecosystem | единственный prod path Phase 1–2 |
 | **Systems reliability** | OpenAI train infra essays | воспроизводимость, governor, degrade profiles |
+| **System ≠ monolith LLM** | Synapse bridge + Construct + contour | decide/escalate отдельно от language; NL-ADR-019 |
+| **Resource economy as moat** | SNN / event-driven / energy proxies | измерять джоуль/ватт/active FLOPs — не только «умнее chat» |
 
-**Девиз канона:** мощная будущая база = **измеримое качество + гибкий Construct + честный scaling**, не копирование GPT-секретов.
+**Девиз канона:** мощная будущая база = **измеримое качество + гибкий Construct + честный scaling + экономия ресурсов**, не копирование GPT/Kimi/Grok.  
+North star: [`STRATEGY.md`](STRATEGY.md) · NL-ADR-019.
 
 ---
 

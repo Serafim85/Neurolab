@@ -86,6 +86,8 @@ path = "/Users/valentin/Projects/neurolab/artifacts/base/Qwen2.5-3B-Instruct-Q4_
 - [ ] Human: текст для SI / не overpromise
 - [ ] Optional ADR в Commercial при смене default preset
 
+**Synapse Brain Gate (explain + audit):** отдельный handoff — [`COMMERCIAL-GATE-HANDOFF.md`](COMMERCIAL-GATE-HANDOFF.md). Не путать с pack checklist выше; class fix остаётся в Synapse.
+
 ---
 
 ## 5. Construct + Micro-MoE в продукте
