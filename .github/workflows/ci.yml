@@ -1,0 +1,98 @@
+# Neurolab CI — the part of `scripts/gate.sh` that a clean runner can honestly do.
+#
+# Deliberately absent, do not "fix" by adding:
+#   * the 3 integration tests in sandbox/tests (marker `integration`) — they start
+#     a local Outpost: sovereignd release binary + GGUF + Metal. A GitHub runner
+#     has none of that, so adding them means either a red CI or a fake pass.
+#     Run them locally: cd sandbox && PYTHONPATH=src python -m pytest -q -m integration
+#   * anything needing a GPU, network access to model hosts, or Commercial
+#     binaries from ~/Projects/AI-Platform-Vision.
+#
+# sandbox/scripts/demo_pack.sh is not a separate job: it runs 6 of the same
+# examples the "Sandbox examples" step already covers.
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        # 3.11 is the floor in sandbox/pyproject.toml; 3.12 is what the lab
+        # machine runs. Both, so the two never quietly drift apart.
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: sandbox/pyproject.toml
+
+      - name: Install sandbox (numpy + pytest only)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e "./sandbox[dev]"
+
+      - name: No weights or adapters in git
+        shell: bash
+        run: |
+          if git ls-files | grep -Ei '\.(gguf|safetensors|ckpt|pt|pth)$'; then
+            echo "the files above are weights and must never enter git"
+            exit 1
+          fi
+          echo "ok: no tracked weight files"
+
+      - name: Doc links
+        run: python scripts/check_doc_links.py
+
+      - name: Sandbox unit tests
+        shell: bash
+        working-directory: sandbox
+        env:
+          PYTHONPATH: src
+        run: python -m pytest -q -m "not integration"
+
+      - name: Sandbox examples
+        shell: bash
+        working-directory: sandbox
+        env:
+          PYTHONPATH: src
+        run: |
+          status=0
+          for project in examples/*/project.toml; do
+            out="$(mktemp -d)"
+            # `cli run` exits non-zero when budget_ok is false.
+            if python -m closed_sandbox.cli run "$project" --seed 42 --out "$out" >/dev/null; then
+              echo "ok   $project"
+            else
+              echo "FAIL $project"
+              status=1
+            fi
+            rm -rf "$out"
+          done
+          exit "$status"
+
+      - name: Root tests
+        shell: bash
+        run: |
+          # tests/ is owned by the eval track; absent is not a failure.
+          if [ -d tests ]; then
+            python -m pytest tests -q
+          else
+            echo "SKIP: tests/ not present"
+          fi

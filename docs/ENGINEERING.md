@@ -153,8 +153,76 @@ eval: link to results
 
 ## 8. Review checklist перед merge/commit
 
+- [ ] `bash scripts/gate.sh` → `GATE: PASS` (закрывает первые три пункта ниже)
 - [ ] `.gguf` не в индексе
 - [ ] Скрипты executable + `set -euo pipefail`
 - [ ] Docs ссылки не битые (относительные пути)
 - [ ] STATUS обновлён
 - [ ] Одна логическая тема на commit
+
+---
+
+## 9. Шлюз: `scripts/gate.sh`
+
+Девиз «measure first» держится не на памяти, а на одной команде. Гоняй её
+перед любым pack, демо или внешним обещанием:
+
+```bash
+bash scripts/gate.sh            # ~30 s, локально, без GPU и без Commercial
+bash scripts/gate.sh --verbose  # плюс вывод шагов, которые прошли
+PYTHON=python3.11 bash scripts/gate.sh   # другой интерпретатор
+```
+
+| # | Шаг | Что доказывает |
+|---|---|---|
+| 1 | sandbox unit tests | `pytest -m "not integration"` — ядро песочницы цело |
+| 2 | sandbox examples | каждый `sandbox/examples/*/project.toml` отрабатывает (`cli run` даёт non-zero при `budget_ok=false`) |
+| 3 | demo pack | `sandbox/scripts/demo_pack.sh` — домены D0–D4, то, что видит инвестор |
+| 4 | doc links | относительные ссылки в `docs/**`, `AGENTS.md`, `STATUS.md`, `README.md` ведут в живые файлы |
+| 5 | eval scorer | `scripts/score_agent_eval.py --selftest`, иначе smoke интерфейса |
+| 6 | root tests | `pytest tests -q` |
+
+Правила чтения вывода:
+
+- каждый шаг — своя строка `OK` / `FAIL` / `SKIP` + время;
+- последняя строка одна: `GATE: PASS` или `GATE: FAIL`, exit code следует за ней;
+- **`FAIL` печатает вывод упавшего шага целиком** — не надо перезапускать руками;
+- шлюз не останавливается на первом провале: сначала полная картина, потом вердикт;
+- `SKIP` (нет `tests/` или нет скорера) **не** красит шлюз в красный: отсутствие
+  чужого артефакта — не поломка. Но и не считается проверкой.
+
+Проверку ссылок можно гонять отдельно, она мгновенная:
+
+```bash
+python3 scripts/check_doc_links.py                 # дефолтный набор документов
+python3 scripts/check_doc_links.py -v docs/X.md    # конкретный файл
+```
+
+Якоря (`FILE.md#section`) **не** валидируются — проверяется только файловая
+часть. Иначе каждое переименование заголовка красило бы CI.
+
+---
+
+## 10. CI (GitHub Actions)
+
+`.github/workflows/ci.yml` — на `push` и `pull_request`, `ubuntu-latest`,
+Python **3.11 и 3.12** (3.11 — минимум из `sandbox/pyproject.toml`, 3.12 — то,
+что стоит на лабораторной машине; чтобы они не разъехались молча).
+
+CI повторяет шаги 1, 2, 4, 6 шлюза плюс проверку, что в индекс не попали веса
+(`*.gguf`, `*.safetensors`, `*.ckpt`, `*.pt`, `*.pth`).
+
+Чего в CI **нет** и почему — прежде чем «чинить» красный или недостающий шаг:
+
+| Не в CI | Причина |
+|---|---|
+| 3 integration-теста (`-m integration`) | поднимают Outpost: release-бинарь `sovereignd` + GGUF + Metal. На чистом раннере этого нет — добавить значит либо красный CI, либо фальшивый pass |
+| train / LoRA / export | GPU и веса; лаборатория, не раннер |
+| Synapse Gate smoke | Commercial бинарь и порт `:8097` |
+
+Отсюда практическое следствие: **зелёный CI ≠ пройденный шлюз**. Integration
+и всё, что трогает GGUF, гоняются локально:
+
+```bash
+cd sandbox && PYTHONPATH=src python -m pytest -q -m integration
+```
