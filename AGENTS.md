@@ -16,7 +16,9 @@
 ```
 
 **Девизы:** надёжность и качество.  
-**Экономика:** при минимальных ресурсах (compute, RAM, время, люди) — максимум измеримого результата.
+**Экономика:** при минимальных ресурсах (compute, RAM, время, люди) — максимум измеримого результата.  
+**North star:** перекрыть сильные стороны frontier **своей системой** (линейка + Synapse + контур) с измеримой экономией ресурсов — не клон Kimi/Grok (`docs/STRATEGY.md` · NL-ADR-019).  
+Investor excerpt: `docs/INVESTOR-NORTH-STAR.md` · build: `docs/NORTH-STAR-BUILD.md`.
 
 **Фильтр любой задачи:**
 
@@ -48,6 +50,19 @@ Commercial остаётся единственным местом пилотно
 | **`docs/CONSTRUCT.md`** | гибкий конструкт слотов + профили железа (NL-ADR-006) |
 | **`docs/INTELLECTUAL-CANON.md`** | интеллектуальный канон линейки (книги, papers, lab notes) |
 | **`docs/CONTOUR-EGRESS.md`** | контур / своё облако / публичный LLM default off |
+| **`docs/SYNAPSE-BRIDGE.md`** | pointer → Synapse Brain bridge |
+| **`docs/COMMERCIAL-GATE-HANDOFF.md`** | Outpost Gate: explain consumer + audit (impl in Commercial) |
+| **`docs/PILOT-CONTOUR-CHAT.md`** | pilot contour chat: hammer2 + guard 20/20, smoke, demo |
+| **`docs/CLOSED-SANDBOX-MVP.md`** | Closed Sandbox: SNN studio в контуре (`sandbox/`) |
+| **`docs/CLOSED-SANDBOX-AGENTS.md`** | вход для агентов sandbox (ритуал + карта канонов) |
+| **`docs/CLOSED-SANDBOX-CANON.md`** | научный канон SNN/neuromorphic |
+| **`docs/CLOSED-SANDBOX-CODE.md`** | канон кода sandbox (plugins, DoD) |
+| **`docs/CLOSED-SANDBOX-UI.md`** | канон UI (научный/промышленный UX) |
+| **`docs/CLOSED-SANDBOX-UI-PIPELINE.md`** | Design Studio → ★ → Port (Closed Sandbox) |
+| **`docs/CLOSED-SANDBOX-UI-REQS.md`** | FR экранов UI + трассировка к макетам |
+| **`docs/CLOSED-SANDBOX-INDUSTRY.md`** | индустриальный канон (buyers, стандарты) |
+| **`docs/CLOSED-SANDBOX-GRANTS.md`** | грантовая карта Closed Sandbox (EIC / Chips JU / Innosuisse) |
+| **`docs/CLOSED-SANDBOX-VERIFY.md`** | верификация pytest ask↔Outpost |
 | **`docs/TRAIN-TINY-LORA.md`** | рецепт LoRA → GGUF |
 | **`construct/example.toml`** | schema манифеста микросетей |
 | **`docs/GOALS.md`** | цели, задачи, use-cases моделей |
@@ -70,7 +85,8 @@ Commercial остаётся единственным местом пилотно
 1. Прочитать **`STATUS.md`** — не дублировать сделанное.
 2. Прочитать **`docs/DECISIONS.md`** — не переоткрывать принятое.
 3. Сверить **`docs/ARCHITECTURE.md`** § Current focus — одна задача.
-4. При arch/train выборе — глянуть **`docs/INTELLECTUAL-CANON.md`** §2–3.
+4. При arch/train выборе — глянуть **`docs/INTELLECTUAL-CANON.md`** §2–3.  
+   Для Closed Sandbox — старт с **`docs/CLOSED-SANDBOX-AGENTS.md`** (наука / код / индустрия).
 5. Взять **одну** работу из In progress или top Backlog.
 
 ### Во время
@@ -82,12 +98,22 @@ Commercial остаётся единственным местом пилотно
 
 ### Конец (обязательно)
 
-Обновить `STATUS.md`:
+1. Обновить `STATUS.md`:
+   - Done / In progress / Backlog
+   - **Session log** (2–8 строк): что сделано, как проверить, следующие шаги
+2. Новое архитектурное решение → ADR в `docs/DECISIONS.md`.
+3. **Закоммитить и запушить.** Сессия не закрыта, пока `git status` не чист
+   и `git push` не прошёл.
 
-- Done / In progress / Backlog
-- **Session log** (2–8 строк): что сделано, как проверить, следующие шаги)
+```bash
+git status --short          # ничего лишнего? весов и секретов нет?
+git add -A && git commit -m "…"
+git push
+```
 
-Новое архитектурное решение → ADR в `docs/DECISIONS.md`.
+Пункт 3 появился не просто так: однажды ритуал требовал только `STATUS.md`,
+и три недели работы — вся платформа Closed Sandbox — три недели пролежали
+незакоммиченными в репозитории без remote. Девиз «надёжность» начинается здесь.
 
 ---
 

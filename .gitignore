@@ -1,4 +1,6 @@
-# Weights & large artifacts — never commit
+# ============================================================
+# Веса и крупные артефакты — не коммитить никогда (AGENTS.md §8)
+# ============================================================
 *.gguf
 *.bin
 *.safetensors
@@ -11,34 +13,42 @@ artifacts/**
 artifacts/base/**
 !artifacts/base/.gitkeep
 !artifacts/base/SHA256.txt
-eval/results/raw/
+
+# ============================================================
+# JSONL: по умолчанию вне git, ниже — правила-исключения.
+# ВАЖНО: исключения идут ПОСЛЕ этого правила (побеждает последнее совпадение).
+# ============================================================
 *.jsonl
-!eval/prompts.ru.jsonl
-!datasets/tiny-lora-v0/train.messages.jsonl
-!datasets/tiny-lora-v1/train.messages.jsonl
-!datasets/tiny-lora-v1.2/train.messages.jsonl
-!datasets/tiny-lora-v0plus/train.messages.jsonl
+
+# ============================================================
+# Датасеты: пускаем только curated текстовые паки — ПРАВИЛОМ, не перечислением.
+#
+# Раньше здесь был список вида `!datasets/tiny-lora-v0/**` на каждый датасет.
+# Список отстал от реальности, и из истории молча выпали tiny-lora-hammer,
+# hammer2 (данные флагманской модели), hammer3 и agent. Не возвращать
+# перечисление: новый датасет должен попадать в git без правки этого файла.
+# ============================================================
 datasets/**
 !datasets/.gitkeep
-!datasets/README.md
-!datasets/manifest-tiny-lora-v0.md
-!datasets/manifest-tiny-lora-v1.md
-!datasets/manifest-tiny-lora-v1.2.md
-!datasets/manifest-tiny-lora-v0plus.md
-!datasets/base-qwen25-3b.md
-!datasets/tiny-lora-v0/
-!datasets/tiny-lora-v0/**
-!datasets/tiny-lora-v1/
-!datasets/tiny-lora-v1/**
-!datasets/tiny-lora-v1.2/
-!datasets/tiny-lora-v1.2/**
-!datasets/tiny-lora-v0plus/
-!datasets/tiny-lora-v0plus/**
+!datasets/*.md
+!datasets/*/
+!datasets/*/*.md
+!datasets/*/train.messages.jsonl
 
+# ============================================================
+# Eval: промпт-сеты — в git (без них оценки невоспроизводимы).
+# Сырые ответы модели пока вне git; открыть вместе со скорером.
+# ============================================================
+!eval/prompts.ru.jsonl
+!eval/prompts/
+!eval/prompts/*.jsonl
+eval/results/raw/
+
+# ============================================================
 # Python / train
+# ============================================================
 .venv/
 venv/
-requirements-train.lock
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
@@ -48,11 +58,21 @@ outputs/
 lora_out/
 checkpoints/
 
-# OS / IDE
+# ============================================================
+# Closed Sandbox: артефакты прогонов воспроизводимы из project.toml + seed
+# ============================================================
+sandbox/**/out/
+sandbox/**/*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# ============================================================
+# OS / IDE / мусор
+# ============================================================
 .DS_Store
 .idea/
 .vscode/
 *.swp
-
-# stray screenshots
+*.bak
+*.orig
 screenshot*.png

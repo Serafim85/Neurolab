@@ -16,3 +16,4 @@ alwaysApply: true
 9. Evolve via **Model Construct** slots/profiles (`docs/CONSTRUCT.md`) — not one-off monolith forks.
 10. Architecture/train/scale choices: cite `docs/INTELLECTUAL-CANON.md` (adopt/defer).
 11. End session: update `STATUS.md` Session log; ADR if decision changed.
+12. Session is not closed until `git status` is clean and `git push` succeeded.
