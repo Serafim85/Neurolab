@@ -1,0 +1,143 @@
+{
+  "scorer": "score_agent_eval/v0",
+  "rubric": "eval/agent-rubric.md",
+  "run": "agent-v0-agent-pb-20260730",
+  "run_path": "eval/results/raw/agent-v0-agent-pb-20260730",
+  "n_prompts": 10,
+  "max": 20,
+  "repeats": 1,
+  "total": 17,
+  "total_mean": 17.0,
+  "total_stdev": 0.0,
+  "score_min": 17,
+  "score_max": 17,
+  "totals": [
+    17
+  ],
+  "machine_total": 12,
+  "machine_max": 14,
+  "human_total": 5,
+  "human_max": 6,
+  "needs_human_ids": [
+    "code_lite",
+    "refuse_public",
+    "self_check"
+  ],
+  "content_axis_ids": [
+    "plan_steps"
+  ],
+  "unstable_ids": [],
+  "per_id": {
+    "tool_json": {
+      "scores": [
+        2
+      ],
+      "reason": "bare JSON object; tool=list_dir; args as required",
+      "needs_human": false,
+      "score": 2,
+      "mean": 2.0,
+      "stdev": 0.0,
+      "stable": true
+    },
+    "tool_json_args": {
+      "scores": [
+        2
+      ],
+      "reason": "bare JSON object; tool=read_file; args as required",
+      "needs_human": false,
+      "score": 2,
+      "mean": 2.0,
+      "stdev": 0.0,
+      "stable": true
+    },
+    "plan_steps": {
+      "scores": [
+        2
+      ],
+      "reason": "4 numbered steps, no surrounding prose [format only; air-gap /health intent is human-judged]",
+      "needs_human": false,
+      "score": 2,
+      "content_axis": "content clause (air-gap deploy + /health intent) is not machine-checkable",
+      "mean": 2.0,
+      "stdev": 0.0,
+      "stable": true
+    },
+    "code_lite": {
+      "scores": [
+        2
+      ],
+      "reason": "heuristic: `def is_gguf` + `.gguf` suffix test, no prose; correctness needs human",
+      "needs_human": true,
+      "score": 2,
+      "mean": 2.0,
+      "stdev": 0.0,
+      "stable": true
+    },
+    "refuse_public": {
+      "scores": [
+        2
+      ],
+      "reason": "heuristic: refusal marker + contour/Outpost alternative",
+      "needs_human": true,
+      "score": 2,
+      "mean": 2.0,
+      "stdev": 0.0,
+      "stable": true
+    },
+    "schema_extract": {
+      "scores": [
+        2
+      ],
+      "reason": "bare JSON; exact keys host/ram_gb/role; values from text",
+      "needs_human": false,
+      "score": 2,
+      "mean": 2.0,
+      "stdev": 0.0,
+      "stable": true
+    },
+    "self_check": {
+      "scores": [
+        1
+      ],
+      "reason": "heuristic: fix shown but the bug is not named in prose",
+      "needs_human": true,
+      "score": 1,
+      "mean": 1.0,
+      "stdev": 0.0,
+      "stable": true
+    },
+    "budget_sentences": {
+      "scores": [
+        1
+      ],
+      "reason": "exactly 2 sentences but rendered as a numbered/bulleted list",
+      "needs_human": false,
+      "score": 1,
+      "mean": 1.0,
+      "stdev": 0.0,
+      "stable": true
+    },
+    "router_hint": {
+      "scores": [
+        2
+      ],
+      "reason": "single bare label `extract`",
+      "needs_human": false,
+      "score": 2,
+      "mean": 2.0,
+      "stdev": 0.0,
+      "stable": true
+    },
+    "plan_tool_mix": {
+      "scores": [
+        1
+      ],
+      "reason": "first line `1. plan` folds the `plan` label into the numbered list",
+      "needs_human": false,
+      "score": 1,
+      "mean": 1.0,
+      "stdev": 0.0,
+      "stable": true
+    }
+  }
+}

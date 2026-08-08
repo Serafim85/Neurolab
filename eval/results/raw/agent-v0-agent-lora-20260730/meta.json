@@ -1,0 +1,9 @@
+{
+  "base_url": "http://127.0.0.1:8097/v1",
+  "model": "outpost-tiny-agent",
+  "temperature": 0.2,
+  "max_tokens": 256,
+  "prompts": "/Users/valentin/Projects/neurolab/eval/prompts/agent-v0.jsonl",
+  "n": 10,
+  "stamp": "20260730-081346"
+}
