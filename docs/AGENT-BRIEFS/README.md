@@ -1,10 +1,31 @@
-# Agent briefs — parallel tracks (2026-07-29)
+# Agent briefs — parallel tracks
 
 > **Owner (human):** Valentin  
 > **Orchestrator:** parent agent in neurolab  
-> **Rule:** one brief = one agent = one primary repo. No cross-track STATUS wars.
+> **Rule:** one brief = one agent = **one disjoint file set**. No cross-track STATUS wars.
 
-## Tracks
+## Wave 2 — 2026-08-08 (E–I): audit follow-through
+
+Пять треков из аудита 2026-08-08. Количество агентов задано **непересекающимися
+наборами файлов**, а не желанием распараллелить: шестой агент неизбежно полез бы
+в чужие файлы.
+
+| ID | Brief | Owns | Тема |
+|---|---|---|---|
+| **E** | [`E-eval-scorer-variance.md`](E-eval-scorer-variance.md) | `scripts/*eval*`, `tests/`, `eval/README.md`, `.gitignore` | скорер eval + разброс |
+| **F** | [`F-metrics-envelope.md`](F-metrics-envelope.md) | `sandbox/src/**` (кроме UI), `sandbox/tests/**` | обобщение конверта метрик |
+| **G** | [`G-docs-single-truth.md`](G-docs-single-truth.md) | `STATUS.md`, `AGENTS.md`, `ARCHITECTURE.md`, `INDEX.md`, VERIFY, MVP | один источник правды + ротация |
+| **H** | [`H-claims-and-card.md`](H-claims-and-card.md) | `docs/CLAIMS.md`, `scripts/gen_model_card.py`, `models/**` | реестр цитируемых цифр |
+| **I** | [`I-ci-and-gate.md`](I-ci-and-gate.md) | `.github/**`, `scripts/gate.sh`, `check_doc_links.py`, `ENGINEERING.md` | CI + шлюз одной командой |
+
+**Владение файлами — жёсткое.** Если трек считает, что нужна правка в чужом
+файле, он **описывает её в своём результате**, а не делает. Мержит оркестратор.
+`docs/DECISIONS.md` не пишет никто: ADR предлагается текстом в результате.
+
+**Git — только оркестратор.** Ни один агент волны не делает `add` / `commit` /
+`push`: индекс git один, параллельные коммиты его портят.
+
+## Wave 1 — 2026-07-29 (A–D): complete
 
 | ID | Brief | Primary repo | Parallel? |
 |---|---|---|---|
