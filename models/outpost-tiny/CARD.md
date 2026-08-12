@@ -78,6 +78,9 @@ Never merge a model row and a model+runtime row into one number. Citable wording
 
 ## Limits
 
+- **hammer2 filename alias.** `outpost-tiny-hammer2.Q4_K_M.gguf` is byte-identical to
+  `outpost-tiny-hammer.Q4_K_M.gguf` (SHA256 `3a7129549bf19c69…`); one artifact, two names.
+  Do not cite as two models. If you edit the generated block, `gen_model_card.py --check` must still pass.
 - **Two eval numbers, never one.** The GGUF alone and the GGUF behind the
   Commercial runtime are different products. The runtime rows in the table
   above are canned short-circuits in Outpost, not model capability.

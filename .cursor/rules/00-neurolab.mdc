@@ -9,6 +9,7 @@ alwaysApply: true
 2. Then `STATUS.md` and `docs/DECISIONS.md`.
 3. Architecture: `docs/ARCHITECTURE.md`. Engineering: `docs/ENGINEERING.md`.
 4. Mottos: **reliability** and **quality**; minimize resources for maximum measured result.
+   Token/model budget: follow `01-model-economy.mdc` (cheap by default; frontier only for hard judgment).
 5. One task per session from **`STATUS.md` §Summary + §Next — the only source of current focus**; `AGENTS.md` §6 and `ARCHITECTURE.md` §6 just point there. Measure before/after (eval).
 6. Never commit `.gguf`, raw datasets, or secrets.
 7. Do not implement Outpost runtime features here — Commercial repo only.

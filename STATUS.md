@@ -1,6 +1,6 @@
 # Neurolab STATUS
 
-**Last updated:** 2026-08-08
+**Last updated:** 2026-08-13
 
 > **Единственный источник правды о текущем фокусе — этот файл** (§Summary + §Next).
 > `AGENTS.md` §6 и `docs/ARCHITECTURE.md` §6 — только указатели сюда; дубликаты там
@@ -30,6 +30,10 @@
 | micro / diverse | 17 / 16 |
 | **hammer2 + guard** | **20/20** |
 
+**Artifact:** `outpost-tiny-hammer2.Q4_K_M.gguf` is a **byte-identical alias** of
+`outpost-tiny-hammer.Q4_K_M.gguf` (SHA256 `3a7129549bf19c69…`). Ladder score columns
+that differ are **eval/runtime history**, not two separate GGUFs.
+
 GGUF (use): `artifacts/outpost-tiny-hammer.Q4_K_M.gguf`  
 Runtime: Commercial Outpost `[contour_guard] enabled = true`
 
@@ -41,35 +45,33 @@ Runtime: Commercial Outpost `[contour_guard] enabled = true`
    Переход на 7B (Apache-2.0) снимает вопрос; смена locked base = ADR + человек.
    **Сначала бесплатное:** проверить MLX-путь (LoRA поверх 4-бит на Apple Silicon) —
    если 7B укладывается в 16 GB, вопрос бюджета GPU не возникает вовсе.
-2. **Дописать ADR 025–027** в `docs/DECISIONS.md` (конверт метрик — F, единый источник
-   фокуса — G, «наружу только из CLAIMS.md» — H). Номера уже зарезервированы там же;
-   коллизия решена в пользу F, который цитирует 025 в коде.
-3. **`cli.py stress` — последняя жёсткая привязка к спайкам.** Индексирует `r["f1"]`,
-   `r["accuracy"]`, `r["spike_count"]` напрямую ⇒ `KeyError` на generic-домене
-   (проверено). Развилка, из-за которой не сделано наспех: primary-метрику надо брать
-   из `metric_primary`, а тогда флаг `--min-mean-f1` теряет смысл, и его переименование
-   ломает CLI. Решить вместе с UI — тот тоже хардкодит спайковые колонки (`app.js`,
-   `run.html`, `overview.html`): не падает, но показывает прочерки.
-4. **LICENSE репозитория** — три варианта в `docs/AGENT-BRIEFS/results/I.md`. Оговорка
-   трека I стала жёстче: теперь известно, что база non-commercial, поэтому permissive
-   лицензия на репозиторий будет читаться как разрешение на веса, которого нет.
-   Actions проверить не удалось — репозиторий приватный, `gh` не установлен.
-5. **Перепрогнать лист 20/20 с сохранением сырья** — нужен Metal-хост; сейчас
-   каталог сырых ответов флагманского прогона пуст (C-05).
-6. **§ Proof points в `docs/INVESTOR-NORTH-STAR.md`** — переписать по `docs/CLAIMS.md`;
-   формулировки наружу = решение человека (`AGENTS.md` §9).
-7. Дубль `outpost-tiny-hammer2.Q4_K_M.gguf` — удалить или описать как алиас (C-01).
-8. `requirements-train.lock` — снимать на train-боксе, вероятно двумя файлами
-   (CUDA и macOS-arm64): лок с Apple Silicon на CUDA-машине не поставится (трек I).
+2. ~~Дописать ADR 025–027~~ — **done** (wave 3 / J): Accepted в `DECISIONS.md`.
+3. **`cli.py stress` + UI без спайкового хардкода** — brief L (slot 2).
+4. **LICENSE репозитория** — три варианта в `docs/AGENT-BRIEFS/results/I.md`.
+   Actions: репозиторий приватный — проверить в браузере.
+5. **Перепрогнать лист 20/20 с сохранением сырья** — Metal-хост (C-05).
+6. **§ Proof points в `docs/INVESTOR-NORTH-STAR.md`** — по `CLAIMS.md`; человек (`AGENTS.md` §9).
+7. Дубль `hammer2` GGUF — **docs done** (alias, K); удаление с диска ~1.8 GB = human.
+8. **MLX 7B probe** — brief M (slot 2); dual train-lock scaffold — brief O (slot 3).
 9. Pause Tiny LoRA sheet chase · (optional) richer D4 fronts / Chip PDK-adjacent later
 
-Сделано этой волной (было пунктами 1–2): автоскорер с повторами и открытое
-машиночитаемое сырьё — трек E.
+Сделано wave 2: автоскорер, envelope, CLAIMS, CI/gate.  
+Сделано wave 3 slot 1 (cheap): ADR 025–027 · hammer2 alias docs · VERIFY/MVP → 85/CI.
 
 ## Session log
 
 > Записи старше 2026-08-01 — в архиве [`docs/SESSIONS-2026-07.md`](docs/SESSIONS-2026-07.md)
 > (перенесены 2026-08-08 без изменения текста).
+
+### 2026-08-13 — Wave 3 slot 1 (cheap): J + K + N
+
+- **J:** NL-ADR-025/026/027 Accepted в `DECISIONS.md`; Reserved block снят; 028 Proposed
+  без изменений.
+- **K:** `hammer2` зафиксирован как byte-alias `hammer` (`3a712954…`) в Ladder / CLAIMS
+  C-01 / CARD Limits; GGUF с диска не удаляли.
+- **N:** VERIFY + MVP: unit **85**, `gate.sh`, CI workflow; «51» остался только как история.
+- Брифы L/M/O готовы на слоты 2–3. Правило экономии моделей: `01-model-economy.mdc`.
+- Verify: `gate.sh` PASS · `gen_model_card.py --check` · `check_doc_links` OK.
 
 ### 2026-08-08 — NL-ADR-028 (Proposed) + 84 GB диска
 

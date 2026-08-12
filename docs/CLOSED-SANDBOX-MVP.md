@@ -252,9 +252,10 @@ DoD прогона: JSON metrics + короткий markdown report. Без ме
 - [x] Нет секретов / больших датасетов в git
 - [x] Запись в `STATUS.md` Session log
 
-**Verified 2026-08-08:** unit **51 passed** (`-m "not integration"`, 3 deselected).
-Integration в этот прогон **не запускался** — нужен Metal/GPU host + Commercial
-release `sovereignd`; последний зелёный прогон — 2026-07-28.
+**Verified 2026-08-08:** unit **85 passed** (`-m "not integration"`, 3 deselected;
+было 51 до wave 2). Шлюз: `bash scripts/gate.sh` (6 steps, GATE: PASS); CI —
+`.github/workflows/ci.yml`. Integration в этот прогон **не запускался** — нужен
+Metal/GPU host + Commercial release `sovereignd`; последний зелёный прогон — 2026-07-28.
 
 **Verified 2026-07-28:** unit **11 passed**; integration **3 passed** (host Mac).
 

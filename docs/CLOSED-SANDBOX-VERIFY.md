@@ -1,6 +1,6 @@
 # Closed Sandbox — verification sheet
 
-> **Last verified:** 2026-08-08 (unit, agent) · integration — 2026-07-28 (host Mac)  
+> **Last verified:** 2026-08-08 (unit **85 passed**, wave 2) · integration — 2026-07-28 (host Mac)  
 > **Product:** [`CLOSED-SANDBOX-MVP.md`](CLOSED-SANDBOX-MVP.md) · code: `sandbox/`
 
 ---
@@ -18,7 +18,13 @@ PYTHONPATH=src:tests pytest -m integration -v
 
 # Manual smoke
 bash scripts/run_ask_outpost_smoke.sh
+
+# Lab gate (6 steps, ~30 s, no GPU / no Commercial)
+bash ../../scripts/gate.sh
 ```
+
+**CI:** `.github/workflows/ci.yml` runs the CI-safe subset on push/PR (ubuntu, Python 3.11+3.12).
+Integration (`-m integration`) stays local — needs Metal/GPU host + Commercial `sovereignd`.
 
 **Needs for integration:**  
 - GGUF `artifacts/outpost-tiny-hammer.Q4_K_M.gguf`  
@@ -37,7 +43,8 @@ Wrong cwd (e.g. `AI-Platform-Vision`) will collect unrelated tests — always `c
 | 2026-07-28 | `not integration` | **11 passed** | manifest, snn_lif, CLI/report, ask unit errors |
 | 2026-07-28 | `integration` (agent) | **3 passed** | ask API ×2 + CLI ask |
 | 2026-07-28 | full suite (human, Mac) | **11 + 3 passed** | confirmed in terminal after VERIFY expand |
-| 2026-08-08 | `not integration` (agent) | **51 passed, 3 deselected** | D0–D4 + by_scenario + UI P01–P05 + synapse_import + ask unit |
+| 2026-08-08 | `not integration` (agent, wave 1) | **51 passed, 3 deselected** | D0–D4 + by_scenario + UI P01–P05 + synapse_import + ask unit |
+| 2026-08-08 | `not integration` (wave 2, gate) | **85 passed, 3 deselected** | + stress/UI/generic tests (tracks E/F/H); `scripts/gate.sh` 6 steps · CI `.github/workflows/` |
 | 2026-08-08 | `integration` | **not run** | needs Metal/GPU host + Commercial release `sovereignd`; last green 2026-07-28 |
 
 Строка 2026-08-08 закрывает 11-дневный отрыв листа: между 07-28 и 08-08 добавились

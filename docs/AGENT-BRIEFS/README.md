@@ -2,7 +2,22 @@
 
 > **Owner (human):** Valentin  
 > **Orchestrator:** parent agent in neurolab  
-> **Rule:** one brief = one agent = **one disjoint file set**. No cross-track STATUS wars.
+> **Rule:** one brief = one agent = **one disjoint file set**. No cross-track STATUS wars.  
+> **Model economy:** wave 3 defaults to cheap models (`composer-2.5-fast` /
+> `cursor-grok-4.5-high-fast`). Frontier only if the brief says so.
+
+## Wave 3 — 2026-08-13 (J–O): cheap follow-through
+
+| ID | Brief | Owns | Slot | Тема |
+|---|---|---|---|---|
+| **J** | [`J-adr-025-027.md`](J-adr-025-027.md) | `docs/DECISIONS.md` | 1 | ADR 025–027 |
+| **K** | [`K-hammer2-alias.md`](K-hammer2-alias.md) | STATUS Ladder · CLAIMS · CARD caveats | 1 | hammer2 = alias |
+| **N** | [`N-stale-verify-sheets.md`](N-stale-verify-sheets.md) | VERIFY · DEMO-PACK · stale docs | 1 | цифры 85 / CI |
+| **L** | [`L-stress-ui-generic.md`](L-stress-ui-generic.md) | `cli.py` stress · `sandbox/ui/**` | 2 | generic stress/UI |
+| **M** | [`M-mlx-7b-probe.md`](M-mlx-7b-probe.md) | `docs/MLX-7B-PROBE.md` | 2 | MLX 7B go/no-go |
+| **O** | [`O-train-lock-scaffold.md`](O-train-lock-scaffold.md) | train lock docs | 3 | dual lock scaffold |
+
+**Git — только оркестратор.** Агенты не делают `commit` / `push`.
 
 ## Wave 2 — 2026-08-08 (E–I): audit follow-through
 

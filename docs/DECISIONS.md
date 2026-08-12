@@ -472,12 +472,69 @@
 
 ---
 
-> **Reserved numbers.** `NL-ADR-025` is taken by the metrics envelope: wave-2 track F
-> already cites it in shipped code (`sandbox/src/closed_sandbox/engine.py`,
-> `sandbox/tests/test_metrics_envelope.py`), so renumbering would mean editing source.
-> `026` is reserved for "STATUS is the single source of focus" (track G) and `027` for
-> "outward numbers are quoted only from `CLAIMS.md`" (track H). Drafts live in
-> `docs/AGENT-BRIEFS/results/{F,G,H}.md` and still need to be written up here.
+## NL-ADR-025 — Common metrics envelope: `metric_primary` core, spikes by family
+
+**Status:** Accepted (2026-08-08)
+
+**Context:** `engine.run_project` demanded `spike_count`, `synops` and `f1`/`accuracy` from **every** domain, `report.enrich_economy` could only divide by spikes, and the `report.md` columns were hardcoded to spike keys. D2 `biocompute` already had to report `spike_count = 0` to get through the core, and any future non-spiking domain (cost estimate, resource budget, process node) could not exist at all. This blocked D5+ and any reuse of the core.
+
+**Decision:**
+
+1. **Core envelope** — every domain owes exactly three things: `metric_primary` (str, the name of its primary metric), a numeric value under that name, and `budget_ok` (bool). `spike_count` / `synops` / `f1` / `accuracy` are **optional** at the core level.
+2. **Family opt-in for strictness** — a plugin may declare module-level `METRICS_FAMILY`; absent ⇒ `"generic"`. `METRICS_FAMILY = "snn"` additionally requires `spike_count`, `synops` and (`f1` or `accuracy`). D0 `snn_lif`, D1 `neuro_chip`, D3 `biosignal`, D4 `hybrid` = `snn`; D2 `biocompute` and `synapse_import` = `generic`. An unknown family value is an `EngineError` at plugin load.
+3. **Strictness stays where the contract is known** — `synapse_import` keeps `_REQUIRED_SOURCE = ("accuracy", "spike_count", "synops")` on its source fixture (thin core / fat plugins, `CLOSED-SANDBOX-CODE.md` §2).
+4. **Generic economy** — `[economy] cost_key` (optional `cost_unit`) in the manifest yields `quality_per_unit_cost = metric_primary / cost_key`. Existing `quality_per_kspike` / `quality_per_ksynop` keep their names and formulas (NORTH-STAR-BUILD §4). Metrics keys are never renamed. A proxy is omitted when its cost is `0` — no ratio is better than a meaningless one.
+5. **Report is data-driven** — summary bullets and the `## Per scenario` columns come from what the domain actually returned; a non-spiking domain gets no `n/a` spike columns.
+6. **Golden files** — `report.md` and `diff` output are frozen byte-exact in `sandbox/tests/golden/` (`wall_ms` pinned), plus a structural check against a live `anomaly_v0` run. Format drift in the customer-facing artifact now fails the suite.
+
+**Consequences:**
+
+- A domain with no spikes is possible without touching the core; a new domain is still an ADR (this one does not open any).
+- D0–D4 + `synapse_import` behave exactly as before: 7/7 examples run clean, unit suite 51 → 85 passed.
+- Any intentional report format change must regenerate the goldens: `cd sandbox && PYTHONPATH=src:tests python tests/test_report_golden.py`.
+- Still spike-shaped and to be generalized separately: `cli.py` `stress` summary and the `sandbox/ui/` scenario table.
+- `CLOSED-SANDBOX-CODE.md` §3 and `CLOSED-SANDBOX-MVP.md` §7 must be updated to the envelope above (they still list the old D0 required keys).
+
+---
+
+## NL-ADR-026 — STATUS as sole focus source + monthly session-log rotation
+
+**Status:** Accepted (2026-08-08)
+
+**Context:** Current focus was duplicated in `AGENTS.md` §6, `docs/ARCHITECTURE.md` §6, and elsewhere with stale numbers (dead `/16` scale, Tiny LoRA shown as active work against `STATUS.md` "Pause Tiny LoRA sheet chase"). The session log in `STATUS.md` had grown to 449 lines / 59 entries, making the file hard to scan and the agent ritual impossible to follow where it referenced non-existent STATUS sections ("Done / In progress / Backlog").
+
+**Decision:**
+
+1. **`STATUS.md` is the sole source of current focus** — §Summary + §Next only. `AGENTS.md` §6 and `docs/ARCHITECTURE.md` §6 are pointers to this file, not copies of focus text or scores.
+2. **Session log rotation** — entries older than the current calendar month move verbatim to `docs/SESSIONS-<YYYY-MM>.md` without editing text. Rule lives in `AGENTS.md` §4 Конец; first archive: `docs/SESSIONS-2026-07.md` (32 entries ≤2026-07-31).
+3. **Ritual alignment** — agent start step 3 reads `STATUS.md` §Summary + §Next; end-of-session updates §Summary / §Ladder / §Next and the session log only in `STATUS.md`.
+
+**Consequences:**
+
+- One place to update focus per session; drift between canon docs eliminated for AGENTS / ARCHITECTURE.
+- `STATUS.md` shrinks as archives accumulate (449 → 248 lines after July rotation); `docs/INDEX.md` lists session archives.
+- Stale "current" claims in `README.md` §Треки and `docs/SCALE-PLAN.md` §3 were flagged at acceptance time — separate fix, not part of this ADR.
+
+---
+
+## NL-ADR-027 — Outward numbers quoted only from `CLAIMS.md`
+
+**Status:** Accepted (2026-08-08)
+
+**Context:** Honest caveats existed inside the repo (`PILOT-CONTOUR-CHAT.md`, eval reports) but outward-facing docs (`INVESTOR-NORTH-STAR.md` § Proof points) quoted naked numbers (`20/20` without runtime share, `f1 ≈0.93` without spread). Manual `CARD.md` drifted from disk: missing SHA/LICENSE/date, `hammer` and `hammer2` byte-identical, empty raw-evidence dir for the flagship 20/20 run.
+
+**Decision:**
+
+1. **`docs/CLAIMS.md` is the only quotable source** for numbers in grants, SOW, investor decks, and publications — cited verbatim with its caveat. Rows marked `internal` do not go outward.
+2. **Model vs model+runtime never merged** into one headline number; both may appear only as separate CLAIMS rows.
+3. **Machine passport block** in `models/*/CARD.md` comes only from `scripts/gen_model_card.py` (SHA256, sizes, sidecar match, eval scores split model / model+runtime). `--check` gates drift; `MISSING` instead of guessing (e.g. upstream base LICENSE).
+4. **New measured result** → new row in `CLAIMS.md` in the same session, or the number is not quotable outside the lab.
+
+**Consequences:**
+
+- Central registry (`CLAIMS.md`, 28 rows at acceptance) prevents over-promising; `python3 scripts/gen_model_card.py --check` keeps passports aligned with artifacts.
+- `INVESTOR-NORTH-STAR.md` § Proof points still needs rewrite through CLAIMS IDs (C-02, C-20+C-21, C-40, C-11) — GTM wording, human track at acceptance time.
+- Re-run of pilot 20/20 with saved raw answers remains required to make C-02 fully verifiable.
 
 ---
 

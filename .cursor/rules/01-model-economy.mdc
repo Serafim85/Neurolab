@@ -1,0 +1,55 @@
+---
+description: Economize large-model tokens; route cheap work to cheaper models
+alwaysApply: true
+---
+
+# Model economy
+
+Motto: **min tokens → max measured result.** A large model is a scarce tool, not the default worker.
+
+## 1. Tier the work (before you act)
+
+| Tier | Use | Examples |
+|---|---|---|
+| **Script / tools** | No LLM | `gate.sh`, pytest, `rg`, `cmp`, SHA, link check, regenerate CARD |
+| **Cheap model** | Mechanical, bounded, low judgment | grep/explore, boilerplate, format edits, commit message draft, golden-file refresh, STATUS log lines |
+| **Large model** | Hard judgment only | licence/ADR, architecture fork, audit of claims, multi-repo trade-offs, novel failure diagnosis |
+
+If the step is tier-Script, **do not** ask a model. If tier-Cheap, **do not** keep a frontier model on it.
+
+## 2. When YOU are the large model
+
+- One focus from `STATUS.md` §Next — no side quests.
+- Prefer `rg` / targeted `Read` over dumping whole trees into context.
+- Do not re-read files you already have this turn.
+- Cap Session-log / ADR / commit prose; no essay when a table works.
+- Do not spawn parallel subagents for work one agent finishes in <15 min.
+- Stop and ask the human before a second expensive wave.
+
+## 3. Subagents — pick the cheap slot
+
+When launching `Task` / subagents, set `model` explicitly:
+
+- **Default for explore / shell / mechanical briefs:** `composer-2.5-fast` or `cursor-grok-4.5-high-fast`
+- **Inherit / frontier only when** the brief needs architecture judgment, licence/legal reading, or cross-doc conflict resolution
+- Never give five frontier agents the same repo tour — one explore pass, then disjoint file ownership
+
+Brief = DoD + owned paths + “do not git”. Not a second copy of AGENTS.md.
+
+## 4. Switch signal (tell the human)
+
+Ask to continue in a cheaper chat / model when the remaining work is:
+
+- doc typo / STATUS log / rename / golden refresh
+- “run the gate and paste PASS”
+- mechanical apply of an already-decided patch
+
+Phrase: *«Дальше механическое — лучше дешёвая модель / Composer.»*
+
+## 5. Anti-patterns (token burn)
+
+- Full-repo audits “just in case”
+- Parallel agents with overlapping file ownership
+- Pasting large tool outputs back into the prompt when a path + line range suffices
+- Re-deriving facts already in `STATUS.md` / `CLAIMS.md` / ADR
+- Long self-summaries of work the human can see in `git log`
