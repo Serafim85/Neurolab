@@ -1,14 +1,32 @@
 /* CS-P03 Port — wire Run / Results / Export to /api/* */
 (() => {
   const $ = (id) => document.getElementById(id);
-  const METRIC_KEYS = [
+  const METRIC_ORDER = [
     "f1",
     "accuracy",
     "spike_count",
     "synops",
     "latency_proxy_ms",
-    "budget_ok",
+    "wall_ms",
+    "chip_fit_score",
+    "fit_score",
+    "unit_cost_eur",
   ];
+  const METRIC_SKIP = new Set([
+    "project_id",
+    "domain",
+    "seed",
+    "by_scenario",
+    "by_scenario_mode",
+    "metric_primary",
+    "economy_cost_key",
+    "economy_cost_unit",
+    "n_test",
+    "estimate_disclaimer",
+    "quality_per_kspike",
+    "quality_per_ksynop",
+    "quality_per_unit_cost",
+  ]);
 
   const els = {
     project: $("project"),
@@ -19,11 +37,77 @@
     progress: $("progress"),
     progLabel: $("prog-label"),
     metrics: $("metrics"),
+    scenarioHead: $("scenario-head"),
     scenarioBody: $("scenario-body"),
     metaPath: $("meta-path"),
     dlMetrics: $("dl-metrics"),
     dlReport: $("dl-report"),
   };
+
+  function metricKeys(m) {
+    if (!m) return ["budget_ok"];
+    const present = new Set();
+    const primary = m.metric_primary;
+    if (typeof primary === "string" && m[primary] != null) present.add(primary);
+    for (const k of METRIC_ORDER) {
+      if (m[k] != null) present.add(k);
+    }
+    for (const [k, v] of Object.entries(m)) {
+      if (METRIC_SKIP.has(k)) continue;
+      if (typeof v === "number" || typeof v === "boolean") present.add(k);
+    }
+    const keys = [];
+    const seen = new Set(["budget_ok"]);
+    if (primary && present.has(primary)) {
+      keys.push(primary);
+      seen.add(primary);
+    }
+    for (const k of METRIC_ORDER) {
+      if (present.has(k) && !seen.has(k)) {
+        keys.push(k);
+        seen.add(k);
+      }
+    }
+    for (const k of [...present].sort()) {
+      if (!seen.has(k)) keys.push(k);
+    }
+    if (m.budget_ok != null && !keys.includes("budget_ok")) keys.push("budget_ok");
+    return keys;
+  }
+
+  function scenarioColumns(by, metrics) {
+    const rows = by && typeof by === "object" ? Object.values(by) : [];
+    const present = new Set(["n"]);
+    for (const row of rows) {
+      if (!row || typeof row !== "object") continue;
+      for (const [k, v] of Object.entries(row)) {
+        if (k !== "n" && (typeof v === "number" || typeof v === "boolean")) {
+          present.add(k);
+        }
+      }
+    }
+    if (!present.size && metrics) {
+      for (const k of metricKeys(metrics)) present.add(k);
+    }
+    const primary = metrics?.metric_primary;
+    const cols = ["n"];
+    const seen = new Set(["n", "budget_ok"]);
+    if (typeof primary === "string" && present.has(primary)) {
+      cols.push(primary);
+      seen.add(primary);
+    }
+    for (const k of METRIC_ORDER) {
+      if (present.has(k) && !seen.has(k)) {
+        cols.push(k);
+        seen.add(k);
+      }
+    }
+    for (const k of [...present].sort()) {
+      if (!seen.has(k)) cols.push(k);
+    }
+    if (present.has("budget_ok") && !cols.includes("budget_ok")) cols.push("budget_ok");
+    return cols;
+  }
 
   function setProgress(state, text) {
     els.progress.className = "progress " + state;
@@ -43,11 +127,12 @@
   }
 
   function renderMetrics(m) {
+    const keys = metricKeys(m);
     els.metrics.innerHTML = "";
-    for (const k of METRIC_KEYS) {
+    for (const k of keys) {
       const card = document.createElement("div");
       card.className = "metric";
-      const val = m[k];
+      const val = m ? m[k] : null;
       let cls = "v";
       if (k === "budget_ok") cls += val ? " ok" : " bad";
       card.innerHTML =
@@ -57,36 +142,25 @@
   }
 
   function renderScenarios(names, metrics) {
-    els.scenarioBody.innerHTML = "";
     const by = (metrics && metrics.by_scenario) || {};
+    const cols = scenarioColumns(by, metrics);
+    if (els.scenarioHead) {
+      els.scenarioHead.innerHTML =
+        "<tr><th>Scenario</th>" + cols.map((c) => `<th>${c}</th>`).join("") + "</tr>";
+    }
+    els.scenarioBody.innerHTML = "";
     const keys = names && names.length ? names : Object.keys(by);
     if (!keys.length) {
       const tr = document.createElement("tr");
-      tr.innerHTML = `<td colspan="6"><code>—</code> no scenarios in manifest</td>`;
+      tr.innerHTML = `<td colspan="${cols.length + 1}"><code>—</code> no scenarios in manifest</td>`;
       els.scenarioBody.appendChild(tr);
       return;
     }
     for (const name of keys) {
       const row = by[name];
       const tr = document.createElement("tr");
-      if (row) {
-        tr.innerHTML = `
-          <td><code>${name}</code></td>
-          <td>${fmt(row.n)}</td>
-          <td>${fmt(row.f1)}</td>
-          <td>${fmt(row.accuracy)}</td>
-          <td>${fmt(row.spike_count)}</td>
-          <td>${fmt(row.synops)}</td>`;
-      } else {
-        // Fallback if by_scenario missing — show aggregate once-labeled.
-        tr.innerHTML = `
-          <td><code>${name}</code></td>
-          <td>—</td>
-          <td>${fmt(metrics?.f1)}</td>
-          <td>${fmt(metrics?.accuracy)}</td>
-          <td>${fmt(metrics?.spike_count)}</td>
-          <td>${fmt(metrics?.synops)}</td>`;
-      }
+      const cells = cols.map((c) => `<td>${fmt(row ? row[c] : metrics?.[c])}</td>`).join("");
+      tr.innerHTML = `<td><code>${name}</code></td>${cells}`;
       els.scenarioBody.appendChild(tr);
     }
   }
@@ -127,16 +201,13 @@
 
   function clearMetricsPending() {
     els.metrics.innerHTML = "";
-    for (const k of METRIC_KEYS) {
-      const card = document.createElement("div");
-      card.className = "metric";
-      card.innerHTML = `<div class="k">${k}</div><div class="v muted">…</div>`;
-      els.metrics.appendChild(card);
-    }
+    const card = document.createElement("div");
+    card.className = "metric";
+    card.innerHTML = `<div class="k">…</div><div class="v muted">running</div>`;
+    els.metrics.appendChild(card);
   }
 
   function paintFrame() {
-    // Ensure "running" UI paints before a fast /api/run returns.
     return new Promise((resolve) => {
       requestAnimationFrame(() => requestAnimationFrame(resolve));
     });
@@ -144,7 +215,7 @@
 
   async function run() {
     els.run.disabled = true;
-    els.cancel.disabled = true; // sync engine — cancel waived (parity)
+    els.cancel.disabled = true;
     clearMetricsPending();
     setProgress("running", "running · closed-sandbox run …");
     await paintFrame();

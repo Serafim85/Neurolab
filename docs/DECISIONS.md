@@ -563,13 +563,14 @@
    already removes the licence problem, and 14B Q4 inference (~9 GB) would crowd a 16 GB box.
 2. Until a 7B line exists, the **3B line is research / evaluation only**. No current GGUF may be
    distributed commercially, and no claim of the right to do so (`CLAIMS.md` §7).
-3. **The blocker is memory, and only memory.** 7B FP16 weights (~15 GB) plus activations do not
-   fit 16 GB of unified memory, and our recipe's 4-bit path is CUDA-only. Before spending money,
-   **check the MLX route**: Apple's MLX does LoRA over a 4-bit quantised model on Apple Silicon,
-   which should put 7B inside 16 GB. Unverified, and absent from `docs/TRAIN-TINY-LORA.md` §0 —
-   verify it first, because if it holds there is no budget question at all. Fallbacks: a rented
-   24 GB CUDA card (the QLoRA path already exists in `scripts/train_tiny_lora.py`) or a larger
-   Mac, and both need human budget approval.
+3. **Memory blocker is lifted for MLX 4-bit LoRA, not for the default PEFT path.**
+   7B FP16 + activations still do not fit 16 GB, and `--load-in-4bit` remains CUDA-only.
+   **MLX probe 2026-08-13 (wave 3 / M):** `mlx_lm lora` on
+   `mlx-community/Qwen2.5-7B-Instruct-4bit` measured **peak 5.022 GB** (1 iter, batch 1,
+   seq 512, grad-checkpoint) on this M1 Pro. Details: `docs/MLX-7B-PROBE.md`.
+   Remaining gap: merge/export to GGUF is not wired through MLX; accepting this ADR still
+   needs a train→GGUF recipe, not a GPU rental. Fallbacks (CUDA 24 GB QLoRA, larger Mac)
+   stay available if the MLX export path is declined.
 4. **Disk is no longer an argument** — see consequences.
 5. Re-collect the ladder on 7B with `scripts/score_agent_eval.py` at temperature 0 with repeats.
    **Carry no 3B number across** — a new base means a new baseline, not a rebased comparison.

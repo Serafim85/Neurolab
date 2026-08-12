@@ -35,13 +35,11 @@
       <button type="button" class="btn" id="refresh">Refresh</button>
     </div>
     <table>
-      <thead>
+      <thead id="project-head">
         <tr>
           <th>Project</th>
           <th>Domain</th>
           <th>Last run</th>
-          <th>f1</th>
-          <th>spike_count</th>
           <th>budget_ok</th>
           <th>Status</th>
           <th></th>
@@ -51,7 +49,7 @@
         <tr><td colspan="8"><code>—</code></td></tr>
       </tbody>
     </table>
-    <p class="hint">Metric keys match CLI: f1 · spike_count · budget_ok · synops · latency_proxy_ms</p>
+    <p class="hint" id="metric-hint">Metric columns derived from last run metrics.json</p>
   </main>
   <script src="/static/overview.js"></script>
 </body>

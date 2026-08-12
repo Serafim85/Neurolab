@@ -14,6 +14,8 @@
 
 Не тащим Unsloth в default requirements (ломает Apple Silicon).
 
+**Apple Silicon 7B (probe only):** `--load-in-4bit` здесь не работает (CUDA QLoRA). Альтернатива — **MLX** (`mlx-lm lora` на `mlx-community/Qwen2.5-7B-Instruct-4bit`); на M1 Pro 16 GB probe показал peak **~5 GB** — см. `docs/MLX-7B-PROBE.md`. Не меняет locked base (NL-ADR-028 Proposed); export в GGUF через MLX пока не в скриптах.
+
 ---
 
 ## 1. Setup

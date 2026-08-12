@@ -13,10 +13,85 @@ from closed_sandbox.engine import EngineError, run_project
 from closed_sandbox.manifest import ManifestError, load_project
 from closed_sandbox.report import (
     diff_metrics,
+    enrich_economy,
     load_metrics_json,
     write_json,
     write_markdown,
 )
+
+_STRESS_OPTIONAL_KEYS = (
+    "f1",
+    "accuracy",
+    "spike_count",
+    "synops",
+    "latency_proxy_ms",
+    "wall_ms",
+    "chip_fit_score",
+)
+_STRESS_SKIP_COLS = frozenset(
+    {
+        "seed",
+        "project_id",
+        "domain",
+        "by_scenario",
+        "by_scenario_mode",
+        "metric_primary",
+        "economy_cost_key",
+        "economy_cost_unit",
+        "n_test",
+    }
+)
+
+
+def _numeric_series(rows: list[dict], key: str) -> list[float]:
+    vals: list[float] = []
+    for row in rows:
+        val = row.get(key)
+        if isinstance(val, (int, float)) and not isinstance(val, bool):
+            vals.append(float(val))
+    return vals
+
+
+def _deprecated_min_mean_f1_action(option_strings: tuple[str, ...]) -> type[argparse.Action]:
+    class _Action(argparse.Action):
+        def __call__(
+            self,
+            parser: argparse.ArgumentParser,
+            namespace: argparse.Namespace,
+            values: object,
+            option_string: str | None = None,
+        ) -> None:
+            print(
+                "warning: --min-mean-f1 is deprecated; use --min-primary",
+                file=sys.stderr,
+            )
+            setattr(namespace, "min_primary", values)
+
+    return _Action
+
+
+def _stress_table_columns(rows: list[dict], primary: str) -> list[str]:
+    present: set[str] = set()
+    for row in rows:
+        for key, val in row.items():
+            if key in _STRESS_SKIP_COLS:
+                continue
+            if isinstance(val, (int, float, bool)):
+                present.add(key)
+    columns: list[str] = []
+    seen: set[str] = set()
+    if primary in present:
+        columns.append(primary)
+        seen.add(primary)
+    for key in _STRESS_OPTIONAL_KEYS:
+        if key in present and key not in seen:
+            seen.add(key)
+            columns.append(key)
+    for key in sorted(present - seen - {"budget_ok"}):
+        columns.append(key)
+    if "budget_ok" in present:
+        columns.append("budget_ok")
+    return columns
 
 
 def _cmd_run(args: argparse.Namespace) -> int:
@@ -74,67 +149,102 @@ def _cmd_stress(args: argparse.Namespace) -> int:
         rows.append(m)
         write_json(m, out_dir / f"seed-{seed}.json")
 
-    f1s = [float(r["f1"]) for r in rows]
-    accs = [float(r["accuracy"]) for r in rows]
-    spikes = [float(r["spike_count"]) for r in rows]
-    walls = [float(r.get("wall_ms", 0.0)) for r in rows]
+    primary = str(rows[0].get("metric_primary", "f1"))
+    primaries = _numeric_series(rows, primary)
+    if not primaries:
+        print(
+            f"error: no numeric values for metric_primary={primary!r}",
+            file=sys.stderr,
+        )
+        return 1
+
+    walls = _numeric_series(rows, "wall_ms")
     budget_oks = sum(1 for r in rows if r.get("budget_ok"))
 
-    summary = {
+    summary: dict[str, object] = {
         "project_id": project["project"]["id"],
         "domain": project["project"]["domain"],
+        "metric_primary": primary,
         "n_seeds": len(seeds),
         "seeds_from": args.seeds_from,
-        "f1_mean": round(statistics.fmean(f1s), 4),
-        "f1_stdev": round(statistics.pstdev(f1s), 4) if len(f1s) > 1 else 0.0,
-        "f1_min": min(f1s),
-        "f1_max": max(f1s),
-        "accuracy_mean": round(statistics.fmean(accs), 4),
-        "spike_count_mean": round(statistics.fmean(spikes), 1),
-        "wall_ms_mean": round(statistics.fmean(walls), 1),
+        f"{primary}_mean": round(statistics.fmean(primaries), 4),
+        f"{primary}_stdev": round(statistics.pstdev(primaries), 4)
+        if len(primaries) > 1
+        else 0.0,
+        f"{primary}_min": min(primaries),
+        f"{primary}_max": max(primaries),
+        "wall_ms_mean": round(statistics.fmean(walls), 1) if walls else 0.0,
         "budget_ok_rate": round(budget_oks / len(rows), 4),
-        "quality_per_kspike_mean": round(
-            1000.0 * statistics.fmean(f1s) / max(statistics.fmean(spikes), 1.0), 6
-        ),
-        "worst_seed": seeds[f1s.index(min(f1s))],
-        "best_seed": seeds[f1s.index(max(f1s))],
+        "worst_seed": seeds[primaries.index(min(primaries))],
+        "best_seed": seeds[primaries.index(max(primaries))],
     }
+    for key in _STRESS_OPTIONAL_KEYS:
+        if key == primary or not any(key in r for r in rows):
+            continue
+        vals = _numeric_series(rows, key)
+        if vals:
+            summary[f"{key}_mean"] = round(
+                statistics.fmean(vals), 4 if key != "spike_count" else 1
+            )
+    enriched = enrich_economy({primary: summary[f"{primary}_mean"], **rows[0]})
+    if "quality_per_kspike" in enriched:
+        summary["quality_per_kspike_mean"] = enriched["quality_per_kspike"]
+    if "quality_per_ksynop" in enriched:
+        summary["quality_per_ksynop_mean"] = enriched["quality_per_ksynop"]
     write_json(summary, out_dir / "summary.json")
 
+    primary_mean = summary[f"{primary}_mean"]
+    primary_stdev = summary[f"{primary}_stdev"]
     lines = [
         f"# Stress report — {summary['project_id']}",
         "",
         f"- domain: `{summary['domain']}`",
         f"- seeds: `{seeds[0]}…{seeds[-1]}` (n={summary['n_seeds']})",
-        f"- f1 mean±stdev: **{summary['f1_mean']} ± {summary['f1_stdev']}**",
-        f"- f1 range: `{summary['f1_min']}` … `{summary['f1_max']}`",
-        f"- accuracy mean: `{summary['accuracy_mean']}`",
-        f"- spike_count mean: `{summary['spike_count_mean']}`",
-        f"- wall_ms mean: `{summary['wall_ms_mean']}`",
-        f"- budget_ok rate: **{summary['budget_ok_rate']}**",
-        f"- quality_per_kspike (mean f1): `{summary['quality_per_kspike_mean']}`",
-        f"- worst seed: `{summary['worst_seed']}` · best: `{summary['best_seed']}`",
-        "",
-        "## Resource economy (v0)",
-        "",
-        "See `docs/NORTH-STAR-BUILD.md` §4 — quality under event cost.",
-        "",
-        "## Per-seed f1",
-        "",
-        "| seed | f1 | accuracy | spikes | budget_ok | wall_ms |",
-        "|---|---:|---:|---:|---|---:|",
+        f"- primary (`{primary}`) mean±stdev: **{primary_mean} ± {primary_stdev}**",
+        f"- primary range: `{summary[f'{primary}_min']}` … `{summary[f'{primary}_max']}`",
     ]
-    for r in rows:
+    for key in _STRESS_OPTIONAL_KEYS:
+        mean_key = f"{key}_mean"
+        if mean_key in summary:
+            lines.append(f"- {key} mean: `{summary[mean_key]}`")
+    lines.extend(
+        [
+            f"- wall_ms mean: `{summary['wall_ms_mean']}`",
+            f"- budget_ok rate: **{summary['budget_ok_rate']}**",
+        ]
+    )
+    if "quality_per_kspike_mean" in summary:
         lines.append(
-            f"| {r['seed']} | {r['f1']} | {r['accuracy']} | {r['spike_count']} | "
-            f"{r['budget_ok']} | {r.get('wall_ms', '')} |"
+            f"- quality_per_kspike: `{summary['quality_per_kspike_mean']}`"
         )
+    if "quality_per_ksynop_mean" in summary:
+        lines.append(
+            f"- quality_per_ksynop: `{summary['quality_per_ksynop_mean']}`"
+        )
+    lines.extend(
+        [
+            f"- worst seed: `{summary['worst_seed']}` · best: `{summary['best_seed']}`",
+            "",
+            "## Resource economy (v0)",
+            "",
+            "See `docs/NORTH-STAR-BUILD.md` §4 — quality under event cost.",
+            "",
+            f"## Per-seed {primary}",
+            "",
+        ]
+    )
+    table_cols = _stress_table_columns(rows, primary)
+    lines.append("| seed | " + " | ".join(table_cols) + " |")
+    lines.append("|---|" + "|".join(["---:"] * len(table_cols)) + "|")
+    for row in rows:
+        cells = " | ".join(str(row.get(col, "")) for col in table_cols)
+        lines.append(f"| {row['seed']} | {cells} |")
     lines.append("")
     (out_dir / "report.md").write_text("\n".join(lines), encoding="utf-8")
     print(json.dumps(summary, indent=2, sort_keys=True))
     print(f"wrote {out_dir / 'summary.json'}", file=sys.stderr)
     print(f"wrote {out_dir / 'report.md'}", file=sys.stderr)
-    return 0 if summary["f1_mean"] >= args.min_mean_f1 else 3
+    return 0 if float(summary[f"{primary}_mean"]) >= args.min_primary else 3
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -163,7 +273,13 @@ def build_parser() -> argparse.ArgumentParser:
     stress_p.add_argument("--n-seeds", type=int, default=20)
     stress_p.add_argument("--seeds-from", type=int, default=0)
     stress_p.add_argument("--out", type=str, default=None)
-    stress_p.add_argument("--min-mean-f1", type=float, default=0.75)
+    stress_p.add_argument("--min-primary", type=float, default=0.75, dest="min_primary")
+    stress_p.add_argument(
+        "--min-mean-f1",
+        type=float,
+        action=_deprecated_min_mean_f1_action(("--min-mean-f1",)),
+        help="deprecated alias for --min-primary",
+    )
     stress_p.set_defaults(func=_cmd_stress)
 
     ui_p = sub.add_parser(
