@@ -33,8 +33,9 @@ Do **not** promote micro / diverse / agent* for a pilot. They are experiments;
 | Field | Value |
 |---|---|
 | Base model | Qwen2.5-7B-Instruct · NL-ADR-028 (locked) |
-| Base GGUF | **MISSING** under `artifacts/base/` |
-| SHA256 (disk) | **MISSING** |
+| Base GGUF | `artifacts/base/Qwen2.5-7B-Instruct-Q4_K_M.gguf` · 4.36 GiB |
+| SHA256 (disk) | `3e357ab3eda2c442f25c0080bb8998eedc05fd16ce1728eacff9ccc5c3d240c6` |
+| Recorded SHA | **MISMATCH** `d44e2c5d1ec3cae1d5cf6a744bee528e46c65a1e66e741fa92730967e7d625bb` (`artifacts/base/SHA256.txt`) |
 | Upstream LICENSE | `docs/BASE-LICENSE.md` |
 
 ### Artifacts on disk
