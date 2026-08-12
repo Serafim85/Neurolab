@@ -10,7 +10,7 @@
 
 | Area | State |
 |---|---|
-| **Best lab GGUF** | 3B hammer (17/20) — **research-only**; locked base now **7B** (NL-ADR-028) |
+| **Best lab GGUF** | **7B hammer LoRA** (unevaled) · 3B hammer 17/20 = research-only |
 | **Demo / eval bar** | 3B hammer2 + guard · 20/20 — **historical**, not 7B |
 | **⚠️ Base LICENSE** | **Locked: Qwen2.5-7B-Instruct Apache-2.0** · 3B line `qwen-research` archive |
 | micro / diverse | 17 / 16 — not promoted |
@@ -36,15 +36,15 @@ that differ are **eval/runtime history**, not two separate GGUFs.
 
 **Ladder below is 3B history** (research-only). 7B scores: empty until first eval.
 
-GGUF 3B (archive): `artifacts/outpost-tiny-hammer.Q4_K_M.gguf`  
-GGUF 7B (lock, vanilla until LoRA export): `artifacts/base/Qwen2.5-7B-Instruct-Q4_K_M.gguf`
+GGUF 7B LoRA: `artifacts/outpost-tiny-7b-hammer.Q4_K_M.gguf`  
+GGUF 7B vanilla: `artifacts/base/Qwen2.5-7B-Instruct-Q4_K_M.gguf`  
+GGUF 3B archive: `artifacts/outpost-tiny-hammer.Q4_K_M.gguf`
 
 ## Next
 
-1. **Довести 7B линию до GGUF + eval.** Vanilla 7B Q4 — locked inference base.
-   LoRA: `scripts/train_mlx_lora.py` на hammer2-данных; `--export-gguf` (fuse
-   dequantize + llama.cpp). Не цитировать 3B 17/20 как 7B.
-2. ~~ADR 025–027~~ · ~~stress/UI~~ · ~~MLX probe~~ · ~~принять ADR-028~~ **done**.
+1. **Eval 7B hammer на контурном листе** (сырьё сохранить). GGUF:
+   `artifacts/outpost-tiny-7b-hammer.Q4_K_M.gguf`. Не цитировать 3B 17/20 как 7B.
+2. ~~ADR 025–027~~ · ~~stress/UI~~ · ~~MLX probe~~ · ~~ADR-028~~ · ~~7B LoRA→GGUF~~ **done**.
 3. Leftover L: `ui_server.py` overview API ещё фиксирует f1/spikes.
 4. **LICENSE репозитория** — `docs/AGENT-BRIEFS/results/I.md`.
 5. **Перепрогнать контурный лист на 7B** с сырьём (C-05 логика, новая база).
@@ -59,6 +59,14 @@ GGUF 7B (lock, vanilla until LoRA export): `artifacts/base/Qwen2.5-7B-Instruct-Q
 
 > Записи старше 2026-08-01 — в архиве [`docs/SESSIONS-2026-07.md`](docs/SESSIONS-2026-07.md)
 > (перенесены 2026-08-08 без изменения текста).
+
+### 2026-08-13 — First 7B LoRA GGUF (hammer data)
+
+- `artifacts/outpost-tiny-7b-hammer.Q4_K_M.gguf` (4.4 GiB, SHA `1ed25d6d…ba28`).
+  MLX LoRA 76 iters → fuse `--dequantize` → llama.cpp convert (`.venv` torch) → Q4_K_M.
+- Convert must not use mlx python (no torch). Script now honors `CONVERT_PYTHON`.
+- **No 7B eval yet.** 3B 17/20 is not this file.
+- Verify: `ls -lh artifacts/outpost-tiny-7b-hammer.Q4_K_M.gguf`
 
 ### 2026-08-13 — NL-ADR-028 Accepted: locked base = 7B
 

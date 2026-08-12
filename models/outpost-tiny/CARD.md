@@ -42,6 +42,7 @@ Do **not** promote micro / diverse / agent* for a pilot. They are experiments;
 
 | ID | GGUF | Size | SHA256 (disk) | Recorded SHA |
 |---|---|---|---|---|
+| 7b-hammer (first 7B LoRA) | `artifacts/outpost-tiny-7b-hammer.Q4_K_M.gguf` | 4.36 GiB | `1ed25d6d2cbb2b01…ba28` | match |
 | hammer2 (pilot) | `artifacts/outpost-tiny-hammer.Q4_K_M.gguf` | 1.80 GiB | `3a7129549bf19c69…6e8c` | match |
 | hammer2 (second copy) | `artifacts/outpost-tiny-hammer2.Q4_K_M.gguf` | 1.80 GiB | `3a7129549bf19c69…6e8c` | **none on disk** |
 | v0 | `artifacts/outpost-tiny-v0.Q4_K_M.gguf` | 1.80 GiB | `405b4443e75856fd…27a7` | match |

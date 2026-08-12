@@ -115,9 +115,12 @@ def export_gguf(args: argparse.Namespace, run_dir: Path) -> None:
             "--dequantize",
         ]
     )
+    convert_py = os.environ.get("CONVERT_PYTHON", str(ROOT / ".venv" / "bin" / "python3"))
+    if not Path(convert_py).is_file():
+        convert_py = args.python
     run(
         [
-            args.python,
+            convert_py,
             str(convert),
             str(fused),
             "--outfile",

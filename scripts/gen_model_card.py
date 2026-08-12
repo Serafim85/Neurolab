@@ -48,6 +48,7 @@ LICENSE_CANDIDATES = (
 
 # id -> GGUF file under artifacts/. Order is the order printed in the card.
 ARTIFACTS = (
+    ("7b-hammer (first 7B LoRA)", "outpost-tiny-7b-hammer.Q4_K_M.gguf"),
     ("hammer2 (pilot)", "outpost-tiny-hammer.Q4_K_M.gguf"),
     ("hammer2 (second copy)", "outpost-tiny-hammer2.Q4_K_M.gguf"),
     ("v0", "outpost-tiny-v0.Q4_K_M.gguf"),

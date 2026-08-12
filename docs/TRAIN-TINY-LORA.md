@@ -24,8 +24,9 @@ python3 scripts/train_mlx_lora.py --skip-train \
 ```
 
 `--export-gguf` needs `LLAMA_CPP` (default `~/Projects/llama.cpp`) with
-`convert_hf_to_gguf.py` and `build/bin/llama-quantize`. `mlx_lm fuse --export-gguf`
-does not support `qwen2`; the script dequantizes then converts.
+`convert_hf_to_gguf.py` and `build/bin/llama-quantize`. Fuse uses the MLX
+interpreter; convert uses `.venv` (`CONVERT_PYTHON`) because mlx-lm has no torch.
+`mlx_lm fuse --export-gguf` does not support `qwen2`.
 
 Inference base GGUF (no LoRA): `datasets/base-qwen25-7b.md`.
 
