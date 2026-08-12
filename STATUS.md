@@ -10,8 +10,9 @@
 
 | Area | State |
 |---|---|
-| **Best lab GGUF** | hammer2 (model alone was 17/20) |
-| **Demo / eval bar** | **hammer2 + contour_guard · 20/20** (ADR-047) |
+| **Best lab GGUF** | 3B hammer (17/20) — **research-only**; locked base now **7B** (NL-ADR-028) |
+| **Demo / eval bar** | 3B hammer2 + guard · 20/20 — **historical**, not 7B |
+| **⚠️ Base LICENSE** | **Locked: Qwen2.5-7B-Instruct Apache-2.0** · 3B line `qwen-research` archive |
 | micro / diverse | 17 / 16 — not promoted |
 | **Closed Sandbox** | **D0–D4** · **P01–P05** · **by_scenario split** · Gate pilot ON |
 | **Pilot chat** | pack + smoke green (`PILOT-CONTOUR-CHAT.md`) |
@@ -19,7 +20,6 @@
 | **Synapse bridge** | **v0.3** · Gate ADR-054 · **pilot-contour-gate ON** (:8097) · smoke 3/3 · SOW Approved |
 | **Eval scorer** | `scripts/score_agent_eval.py` · 55/60 совпадений с ручной оценкой · repeats |
 | **CI / gate** | GitHub Actions + `scripts/gate.sh` (6 шагов) · 88 sandbox + 56 root tests |
-| **⚠️ Base LICENSE** | **`qwen-research` — NON-COMMERCIAL only** ([`docs/BASE-LICENSE.md`](docs/BASE-LICENSE.md)) · блокирует коммерческую поставку весов · решение человека |
 
 ### Ladder
 
@@ -34,33 +34,41 @@
 `outpost-tiny-hammer.Q4_K_M.gguf` (SHA256 `3a7129549bf19c69…`). Ladder score columns
 that differ are **eval/runtime history**, not two separate GGUFs.
 
-GGUF (use): `artifacts/outpost-tiny-hammer.Q4_K_M.gguf`  
-Runtime: Commercial Outpost `[contour_guard] enabled = true`
+**Ladder below is 3B history** (research-only). 7B scores: empty until first eval.
+
+GGUF 3B (archive): `artifacts/outpost-tiny-hammer.Q4_K_M.gguf`  
+GGUF 7B (lock, vanilla until LoRA export): `artifacts/base/Qwen2.5-7B-Instruct-Q4_K_M.gguf`
 
 ## Next
 
-1. **Решение по базе (человек, блокер).** База `qwen-research` non-commercial;
-   NL-ADR-028 Proposed. **MLX probe = GO** (peak 5.0 GB на 7B-Instruct 4bit,
-   [`docs/MLX-7B-PROBE.md`](docs/MLX-7B-PROBE.md)) — аренда GPU не нужна для LoRA.
-   Остаётся: принять ADR + рецепт merge/export GGUF через MLX (не wired).
-2. ~~Дописать ADR 025–027~~ — **done** (J).
-3. ~~`stress` + UI без спайкового хардкода~~ — **done** (L). Leftover: `ui_server.py`
-   `_list_projects` ещё отдаёт фиксированные `f1`/`spike_count`.
-4. **LICENSE репозитория** — три варианта в `docs/AGENT-BRIEFS/results/I.md`.
-5. **Перепрогнать лист 20/20 с сохранением сырья** — Metal-хост (C-05).
-6. **§ Proof points в `docs/INVESTOR-NORTH-STAR.md`** — по `CLAIMS.md`; человек.
-7. Дубль `hammer2` GGUF — **docs done** (K); удаление с диска ~1.8 GB = human.
-8. Dual train-lock scaffold — brief O (slot 3).
-9. Pause Tiny LoRA sheet chase · (optional) richer D4 fronts / Chip PDK-adjacent later
+1. **Довести 7B линию до GGUF + eval.** Vanilla 7B Q4 — locked inference base.
+   LoRA: `scripts/train_mlx_lora.py` на hammer2-данных; `--export-gguf` (fuse
+   dequantize + llama.cpp). Не цитировать 3B 17/20 как 7B.
+2. ~~ADR 025–027~~ · ~~stress/UI~~ · ~~MLX probe~~ · ~~принять ADR-028~~ **done**.
+3. Leftover L: `ui_server.py` overview API ещё фиксирует f1/spikes.
+4. **LICENSE репозитория** — `docs/AGENT-BRIEFS/results/I.md`.
+5. **Перепрогнать контурный лист на 7B** с сырьём (C-05 логика, новая база).
+6. **§ Proof points** — по `CLAIMS.md`; 3B цифры пометить historical.
+7. Дубль `hammer2` 3B GGUF — docs done; удаление ~1.8 GB = human.
+8. Dual train-lock scaffold — brief O.
+9. Pause Tiny 3B LoRA sheet chase.
 
-Сделано wave 2: автоскорер, envelope, CLAIMS, CI/gate.  
-Сделано wave 3 slot 1: ADR 025–027 · hammer2 alias · VERIFY/MVP → 85/CI.  
-Сделано wave 3 slot 2: stress/UI generic (L) · MLX 7B GO 5.0 GB (M).
+Сделано 2026-08-13: человек принял переезд на 7B (NL-ADR-028).
 
 ## Session log
 
 > Записи старше 2026-08-01 — в архиве [`docs/SESSIONS-2026-07.md`](docs/SESSIONS-2026-07.md)
 > (перенесены 2026-08-08 без изменения текста).
+
+### 2026-08-13 — NL-ADR-028 Accepted: locked base = 7B
+
+- Человек: «переезжаем». NL-ADR-002 superseded. Locked base =
+  **Qwen2.5-7B-Instruct (Apache-2.0)**. 3B GGUF остаются research-only.
+- Рецепт Mac: `scripts/train_mlx_lora.py` (mlx-lm LoRA → fuse `--dequantize` →
+  llama.cpp GGUF). `mlx_lm fuse --export-gguf` qwen2 не умеет.
+- Vanilla 7B Q4 тянется в `artifacts/base/`. Первая LoRA — hammer2 jsonl, без
+  переноса цифр 17/20.
+- Verify: `pytest tests/test_train_mlx_lora_data.py` · `gate.sh`.
 
 ### 2026-08-13 — Wave 3 slot 2 (cheap): L + M
 

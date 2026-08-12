@@ -117,7 +117,7 @@ NL-ADR-020…024.
 | **C-50** | «Юнит-набор песочницы: **85 passed** (`pytest -m "not integration"`), плюс шлюз одной командой `scripts/gate.sh` — 6 шагов, GATE: PASS» | Прогон 2026-08-08 на коммите `e030e9e`; CI — `.github/workflows/`; шлюз — `scripts/gate.sh` | Это тесты **нашего кода**, а не валидация научных результатов: golden-файлы фиксируют формат отчёта, а не физику. Было 51 до треков E/F/I — при цитировании брать число из свежего прогона, а не из этой строки | `public` |
 | **C-51** | «Интеграционные тесты `ask` ↔ Outpost: 3 passed» | `docs/CLOSED-SANDBOX-VERIFY.md`; `sandbox/tests/test_ask_outpost.py`, `sandbox/tests/test_ask_cli.py` | Требуют Metal/GPU-хоста, GGUF и Commercial-бинарника; в общем прогоне не участвуют | `public` |
 | **C-52** | «Demo pack: 6 pass / 0 fail на прогоне доменов» | `docs/DEMO-PACK-SANDBOX.md` §2; `sandbox/scripts/demo_pack.sh` | «6» — число примеров, которые отработали без ошибки, **не** число проверенных научных утверждений | `public` |
-| **C-53** | — | `docs/BASE-LICENSE.md` (проверено 2026-08-08 по официальной карточке `Qwen/Qwen2.5-3B-Instruct`) | **База под `qwen-research` — NON-COMMERCIAL only, не Apache-2.0.** §2.a лицензии распространяется на производные работы, то есть на все наши LoRA-merge и GGUF, включая пилотный `hammer`. Research и evaluation разрешены; передача весов платящему пилоту — нет. Любое заявление о праве поставлять веса заказчику запрещено до решения человека (`AGENTS.md` §9) | `internal` |
+| **C-53** | — | `docs/BASE-LICENSE.md`; NL-ADR-028 Accepted 2026-08-13 | **Locked base = Qwen2.5-7B-Instruct, Apache-2.0.** Все 3B GGUF (`hammer` и остальные) остаются производными `qwen-research` — research-only, не в пилотный пак. Коммерческая поставка 7B — только после GGUF 7B на диске и eval на новой базе; цифры 17/20 и 20/20 с 3B **не переносятся** | `internal` |
 
 ---
 
@@ -141,7 +141,7 @@ NL-ADR-020…024.
 | Обучение на ПДн заказчика | `AGENTS.md` §6, §8 |
 | Готовность Mid / 7–14B / arch-MoE | `AGENTS.md` §6; `docs/PILOT-CONTOUR-CHAT.md` §6 |
 | Пилотное обещание того, чего нет в `STATUS.md` Done | `AGENTS.md` §4 |
-| **Право поставить веса Outpost-Tiny заказчику коммерчески** — база `qwen-research`, non-commercial | `docs/BASE-LICENSE.md`; C-53 |
+| **Право поставить 3B-веса Outpost-Tiny заказчику коммерчески** — `qwen-research` | `docs/BASE-LICENSE.md`; C-53 |
 
 Отдельно: **«20/20» без указания, что три пункта закрывает runtime** — это тоже
 запрещённая формулировка, а не просто неточность (см. C-02).

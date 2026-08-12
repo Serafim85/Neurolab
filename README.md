@@ -32,7 +32,7 @@ Commercial runtime: `~/Projects/AI-Platform-Vision`
 
 | | |
 |---|---|
-| **A — Outpost-Tiny** | dense chat на Qwen2.5-3B → LoRA → GGUF |
+| **A — Outpost-Tiny** | dense chat на Qwen2.5-7B (NL-ADR-028) → LoRA → GGUF |
 | **B — Micro-MoE suite** | extract / summarize / router как отдельные GGUF |
 
 Текущий фокус и актуальные цифры — **только** в [`STATUS.md`](STATUS.md)

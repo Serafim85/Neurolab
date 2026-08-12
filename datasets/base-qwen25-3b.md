@@ -1,6 +1,7 @@
 # Base model — Qwen2.5-3B-Instruct Q4
 
-**Locked for Outpost-Tiny v0 baseline.**
+**Locked for Outpost-Tiny v0 baseline — superseded.** NL-ADR-002 → **NL-ADR-028** (7B Apache-2.0).
+This 3B GGUF is **research / evaluation only**. Do not ship commercially. See [`base-qwen25-7b.md`](base-qwen25-7b.md).
 
 | | |
 |---|---|

@@ -1,7 +1,8 @@
-# Train Outpost-Tiny LoRA → GGUF
+# Train Outpost LoRA → GGUF
 
-> Data: `datasets/tiny-lora-v0/` · Scripts: `train_tiny_lora.py` · `merge_tiny_lora.py`  
-> Canon: LoRA + Instruct post-train · Contour-safe (`CONTOUR-EGRESS.md`)
+> Data: `datasets/tiny-lora-hammer2/` (flagship) · 7B: `scripts/train_mlx_lora.py`  
+> 3B PEFT: `train_tiny_lora.py` · `merge_tiny_lora.py` — **research-only** (NL-ADR-002 superseded)  
+> Canon: LoRA + Instruct post-train · Contour-safe (`CONTOUR-EGRESS.md`) · **locked base = 7B (NL-ADR-028)**
 
 ---
 
@@ -9,16 +10,28 @@
 
 | Stack | Когда |
 |---|---|
-| **PEFT + TRL** (default) | Mac MPS / CUDA / CPU — наш скрипт |
-| Unsloth | только NVIDIA CUDA / Colab — быстрее; тот же JSONL |
+| **MLX + mlx-lm** (default on this Mac) | Qwen2.5-7B-Instruct 4bit LoRA · `docs/MLX-7B-PROBE.md` |
+| **PEFT + TRL** | 3B research line, or CUDA 7B QLoRA (`--load-in-4bit`) |
+| Unsloth | только NVIDIA CUDA / Colab — не default (ломает Apple Silicon) |
 
-Не тащим Unsloth в default requirements (ломает Apple Silicon).
+```bash
+source .venv-mlx-probe/bin/activate   # mlx + mlx-lm
+python3 scripts/train_mlx_lora.py \
+  --data datasets/tiny-lora-hammer2/train.messages.jsonl
+# after adapter looks sane:
+python3 scripts/train_mlx_lora.py --skip-train \
+  --out artifacts/runs/<stamp>-mlx --export-gguf
+```
 
-**Apple Silicon 7B (probe only):** `--load-in-4bit` здесь не работает (CUDA QLoRA). Альтернатива — **MLX** (`mlx-lm lora` на `mlx-community/Qwen2.5-7B-Instruct-4bit`); на M1 Pro 16 GB probe показал peak **~5 GB** — см. `docs/MLX-7B-PROBE.md`. Не меняет locked base (NL-ADR-028 Proposed); export в GGUF через MLX пока не в скриптах.
+`--export-gguf` needs `LLAMA_CPP` (default `~/Projects/llama.cpp`) with
+`convert_hf_to_gguf.py` and `build/bin/llama-quantize`. `mlx_lm fuse --export-gguf`
+does not support `qwen2`; the script dequantizes then converts.
+
+Inference base GGUF (no LoRA): `datasets/base-qwen25-7b.md`.
 
 ---
 
-## 1. Setup
+## 1. Setup (3B PEFT — research archive)
 
 ```bash
 cd ~/Projects/neurolab

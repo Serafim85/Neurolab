@@ -2,7 +2,7 @@
 
 > **Статус:** факт, проверенный по первоисточнику · **не юридическая консультация**
 > **Читается:** `scripts/gen_model_card.py` (кандидат `docs/BASE-LICENSE.md`) → блок паспорта в `models/outpost-tiny/CARD.md`
-> **Затрагивает:** NL-ADR-002 (locked base), `docs/CLAIMS.md`, пилотный пак
+> **Затрагивает:** NL-ADR-028 (locked 7B), NL-ADR-002 (superseded 3B), `docs/CLAIMS.md`, пилотный пак
 
 ---
 
@@ -10,9 +10,9 @@
 
 | | |
 |---|---|
-| Модель | **Qwen2.5-3B-Instruct** (NL-ADR-002, locked) |
-| GGUF в лаборатории | `artifacts/base/Qwen2.5-3B-Instruct-Q4_K_M.gguf` |
-| SHA256 | `d44e2c5d1ec3cae1d5cf6a744bee528e46c65a1e66e741fa92730967e7d625bb` |
+| Модель | **Qwen2.5-7B-Instruct** (NL-ADR-028, locked) · Apache-2.0 |
+| GGUF в лаборатории | `artifacts/base/Qwen2.5-7B-Instruct-Q4_K_M.gguf` |
+| Архив 3B | `Qwen2.5-3B-Instruct` — **не locked**; `qwen-research`, research-only |
 
 ## 2. Лицензия — **не Apache-2.0**
 

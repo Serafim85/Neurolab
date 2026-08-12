@@ -19,7 +19,7 @@
 
 ## NL-ADR-002 — Dense Qwen2.5-3B as Tiny v0 base
 
-**Status:** Accepted (2026-07-18)
+**Status:** Accepted (2026-07-18). **Superseded** by NL-ADR-028 (2026-08-13).
 
 **Context:** Need locked baseline; Outpost already has pull preset `qwen2.5-3b-instruct-q4`.
 
@@ -540,7 +540,7 @@
 
 ## NL-ADR-028 — Locked base must leave Qwen2.5-3B (licence); target 7B
 
-**Status:** **Proposed** (2026-08-08) — needs human (`AGENTS.md` §9). Supersedes NL-ADR-002 if accepted.
+**Status:** Accepted (2026-08-13). Human: «переезжаем». Supersedes NL-ADR-002.
 
 **Context:**
 
@@ -557,7 +557,7 @@
   (`docs/TRAIN-TINY-LORA.md` §0, §2).
 - Training data is **small**: 11 sets, 13–92 examples each, 456 total.
 
-**Decision (proposed):**
+**Decision:**
 
 1. Target locked base = **`Qwen2.5-7B-Instruct`** (Apache-2.0). Not 14B as the next step: 7B
    already removes the licence problem, and 14B Q4 inference (~9 GB) would crowd a 16 GB box.
@@ -568,9 +568,10 @@
    **MLX probe 2026-08-13 (wave 3 / M):** `mlx_lm lora` on
    `mlx-community/Qwen2.5-7B-Instruct-4bit` measured **peak 5.022 GB** (1 iter, batch 1,
    seq 512, grad-checkpoint) on this M1 Pro. Details: `docs/MLX-7B-PROBE.md`.
-   Remaining gap: merge/export to GGUF is not wired through MLX; accepting this ADR still
-   needs a train→GGUF recipe, not a GPU rental. Fallbacks (CUDA 24 GB QLoRA, larger Mac)
-   stay available if the MLX export path is declined.
+   Train→GGUF recipe: `scripts/train_mlx_lora.py` + `docs/TRAIN-TINY-LORA.md` § MLX.
+   `mlx_lm fuse --export-gguf` does **not** support `qwen2`; export is fuse `--dequantize`
+   then llama.cpp `convert_hf_to_gguf.py` + `llama-quantize`. Fallbacks (CUDA 24 GB QLoRA,
+   larger Mac) stay if fuse/dequantize OOMs on 16 GB.
 4. **Disk is no longer an argument** — see consequences.
 5. Re-collect the ladder on 7B with `scripts/score_agent_eval.py` at temperature 0 with repeats.
    **Carry no 3B number across** — a new base means a new baseline, not a rebased comparison.
@@ -581,10 +582,12 @@
   research-only base; they stay quotable as lab history, not as product capability.
 - The cheap part is data: 456 examples already curated, no new labelling. The cost is venue plus
   re-eval, and re-eval is now largely automated (track E scorer) — unlike the first climb.
-- Compute is genuinely small: 40–90 examples × 2 epochs per set, so the whole 11-set ladder is a
-  couple of GPU-hours on a 24 GB card. This is a **budget decision, not a training campaign**.
-- If the budget is declined, the lab stays a legitimate research track — but the pilot pack cannot
-  ship weights, and GTM must say so instead of implying otherwise.
+- Compute is small: 40–90 examples × 2 epochs per set on MLX (probe ~0.25 it/s). GPU rental is
+  not required for LoRA. Fuse+dequantize of 7B FP16 on 16 GB unified memory is the remaining
+  risk for GGUF export.
+- Existing 3B GGUFs (`hammer` and the rest) stay on disk as **research-only history**. They are
+  not the locked base and must not ship commercially. New quotable scores start at 7B; do not
+  rebase 3B 17/20 onto 7B.
 - `outpost-tiny-hammer2.Q4_K_M.gguf` is byte-identical to `hammer` (`3a712954…`; all other
   eleven Q4 artifacts hash distinctly, so the ladder is otherwise real). Resolve that duplicate
   before any re-climb so the new ladder does not inherit a phantom rung.

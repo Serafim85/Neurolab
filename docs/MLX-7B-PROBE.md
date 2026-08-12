@@ -1,8 +1,8 @@
 # MLX probe — Qwen2.5-7B-Instruct 4-bit LoRA on M1 Pro 16 GB
 
 > **Date:** 2026-08-13 · **Machine:** Apple M1 Pro, 16 GB unified memory  
-> **Verdict:** **GO** for MLX LoRA probe (peak **5.0 GB** measured)  
-> **Does not change locked base** — NL-ADR-028 stays **Proposed**; 3B remains `qwen-research` (non-commercial), not Apache-2.0.
+> **Verdict:** **GO** for MLX LoRA (peak **5.0 GB** measured)  
+> Locked base is **7B (NL-ADR-028 Accepted 2026-08-13)**. Recipe: `scripts/train_mlx_lora.py`.
 
 ---
 
@@ -85,7 +85,7 @@ Watch the line `Peak mem … GB` in output. Success saves `adapters/adapters.saf
 |---|---|
 | **Stack fork** | MLX path is separate from `scripts/train_tiny_lora.py` (PEFT+TRL). No `--load-in-4bit` on Mac MPS today. |
 | **Export** | MLX adapter → merged HF → GGUF is not wired in lab scripts yet; needs human/ADR before product line. |
-| **ADR-028** | Target 7B / licence escape is **Proposed only** — this probe does not accept NL-ADR-028 or supersede NL-ADR-002. |
+| **ADR-028** | **Accepted 2026-08-13.** Train recipe: `scripts/train_mlx_lora.py`. `fuse --export-gguf` still rejects `qwen2`; export is dequantize + llama.cpp. |
 | **Licence wording** | **3B** = `qwen-research`, non-commercial. **7B-Instruct** = Apache-2.0 (per `docs/BASE-LICENSE.md` / NL-ADR-028 context) — do not claim Apache on 3B. |
 | **Disk** | Model cache ~4 GB; ~70 GB free after probe (was ~79 GB). OK for one 7B Q4; do not pull FP16 + Q4 + extras without plan. |
 | **Network / HF** | First download ~4 GB; slow without `HF_TOKEN`. |

@@ -33,8 +33,9 @@ MISSING = "**MISSING**"
 SKIPPED = "SKIPPED"
 
 BASE_DIR = REPO / "artifacts" / "base"
-BASE_NAME = "Qwen2.5-3B-Instruct"
-BASE_ADR = "NL-ADR-002 (locked)"
+BASE_NAME = "Qwen2.5-7B-Instruct"
+BASE_ADR = "NL-ADR-028 (locked)"
+BASE_GGUF_NAME = "Qwen2.5-7B-Instruct-Q4_K_M.gguf"
 
 # Upstream license is a legal fact, not something this script may guess.
 # It is reported MISSING until one of these lands in the repo.
@@ -197,7 +198,13 @@ def parse_raw_evidence(text: str) -> str:
 
 
 def base_block(skip_hash: bool) -> list[str]:
-    ggufs = sorted(BASE_DIR.glob("*.gguf")) if BASE_DIR.is_dir() else []
+    preferred = BASE_DIR / BASE_GGUF_NAME
+    # Incomplete curl of the 7B GGUF is a few hundred MB; real Q4 is ~4.5 GiB.
+    ggufs = (
+        [preferred]
+        if preferred.is_file() and preferred.stat().st_size >= 1_000_000_000
+        else []
+    )
     lines = ["### Base", "", "| Field | Value |", "|---|---|"]
     lines.append(f"| Base model | {BASE_NAME} · {BASE_ADR} |")
     if not ggufs:
