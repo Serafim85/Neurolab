@@ -1,0 +1,13 @@
+{
+  "base_url": "http://127.0.0.1:8098",
+  "model": "outpost-tiny-7b-holes",
+  "gguf": "artifacts/outpost-tiny-7b-holes.Q4_K_M.gguf",
+  "sha256": "6ae0442fdf93422c528aff2bba9ec05cae7f3df13b49b75fa58ddef68a8b99ca",
+  "temperature": 0.2,
+  "max_tokens": 256,
+  "prompts": "/Users/valentin/Projects/neurolab/eval/prompts.ru.jsonl",
+  "n": 10,
+  "stamp": "20260813-012823",
+  "contour_guard": false,
+  "config": "config/sovereign.tiny-7b-holes.toml"
+}

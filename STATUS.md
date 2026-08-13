@@ -10,8 +10,8 @@
 
 | Area | State |
 |---|---|
-| **Best lab GGUF** | **7B hammer LoRA** (unevaled) · 3B hammer 17/20 = research-only |
-| **Demo / eval bar** | 3B hammer2 + guard · 20/20 — **historical**, not 7B |
+| **Best lab GGUF** | **7B holes LoRA · 15/20** (model-alone) · 3B 17/20 = research-only |
+| **Demo / eval bar** | 7B holes + guard · **19/20** · 3B 20/20 — **historical** |
 | **⚠️ Base LICENSE** | **Locked: Qwen2.5-7B-Instruct Apache-2.0** · 3B line `qwen-research` archive |
 | micro / diverse | 17 / 16 — not promoted |
 | **Closed Sandbox** | **D0–D4** · **P01–P05** · **by_scenario split** · Gate pilot ON |
@@ -34,24 +34,24 @@
 `outpost-tiny-hammer.Q4_K_M.gguf` (SHA256 `3a7129549bf19c69…`). Ladder score columns
 that differ are **eval/runtime history**, not two separate GGUFs.
 
-**Ladder below is 3B history** (research-only). 7B scores: empty until first eval.
+**7B (locked base, 2026-08-13):** holes **15/20** / +guard **19/20** · first hammer LoRA 12/16.  
+**Ladder below is 3B history** (research-only).
 
-GGUF 7B LoRA: `artifacts/outpost-tiny-7b-hammer.Q4_K_M.gguf`  
+GGUF 7B holes: `artifacts/outpost-tiny-7b-holes.Q4_K_M.gguf`  
+GGUF 7B LoRA (first): `artifacts/outpost-tiny-7b-hammer.Q4_K_M.gguf`  
 GGUF 7B vanilla: `artifacts/base/Qwen2.5-7B-Instruct-Q4_K_M.gguf`  
 GGUF 3B archive: `artifacts/outpost-tiny-hammer.Q4_K_M.gguf`
 
 ## Next
 
-1. **Eval 7B hammer на контурном листе** (сырьё сохранить). GGUF:
-   `artifacts/outpost-tiny-7b-hammer.Q4_K_M.gguf`. Не цитировать 3B 17/20 как 7B.
-2. ~~ADR 025–027~~ · ~~stress/UI~~ · ~~MLX probe~~ · ~~ADR-028~~ · ~~7B LoRA→GGUF~~ **done**.
-3. Leftover L: `ui_server.py` overview API ещё фиксирует f1/spikes.
-4. **LICENSE репозитория** — `docs/AGENT-BRIEFS/results/I.md`.
-5. **Перепрогнать контурный лист на 7B** с сырьём (C-05 логика, новая база).
-6. **§ Proof points** — по `CLAIMS.md`; 3B цифры пометить historical.
-7. Дубль `hammer2` 3B GGUF — docs done; удаление ~1.8 GB = human.
-8. Dual train-lock scaffold — brief O.
-9. Pause Tiny 3B LoRA sheet chase.
+1. Leftover L: `ui_server.py` overview API ещё фиксирует f1/spikes.
+2. ~~Eval 7B hammer~~ **done** (12/16). ~~7B holes pack~~ **done** — **15/20** alone, **19/20** +guard.
+   Remaining: `contour_allow_client` = 1.
+3. **LICENSE репозитория** — `docs/AGENT-BRIEFS/results/I.md`.
+4. **§ Proof points** — по `CLAIMS.md`; 7B = C-54–C-57 internal.
+5. Дубль `hammer2` 3B GGUF — docs done; удаление ~1.8 GB = human.
+6. Dual train-lock scaffold — brief O.
+7. Pause Tiny 3B LoRA sheet chase.
 
 Сделано 2026-08-13: человек принял переезд на 7B (NL-ADR-028).
 
@@ -59,6 +59,22 @@ GGUF 3B archive: `artifacts/outpost-tiny-hammer.Q4_K_M.gguf`
 
 > Записи старше 2026-08-01 — в архиве [`docs/SESSIONS-2026-07.md`](docs/SESSIONS-2026-07.md)
 > (перенесены 2026-08-08 без изменения текста).
+
+### 2026-08-13 — 7B holes LoRA (resume hammer2)
+
+- Data: `datasets/tiny-lora-7b-holes/` (18 unique; long_ctx / bullets / VPC). Resume adapter, 36 iters, peak ~5.2 GB.
+- GGUF `outpost-tiny-7b-holes.Q4_K_M.gguf` SHA `6ae0442f…99ca`.
+- Contour: **15/20** alone (`:8098`) · **19/20** +guard (`:8099`). vs first 7B 12/16.
+- Closed: `long_ctx_short` 0→2, `ru_bullets` 1→2. Still 1: `contour_allow_client` (API Gateway).
+- Verify: `eval/results/tiny-7b-holes.md` · `tiny-7b-holes-plus-guard.md`.
+
+### 2026-08-13 — 7B contour eval (Outpost)
+
+- GGUF `outpost-tiny-7b-hammer.Q4_K_M.gguf` на `eval/prompts.ru.jsonl`, temp 0.2, `:8098`.
+- Model-alone **12/20** (`config/sovereign.tiny-7b-hammer.toml`, raw `baseline-20260813-011118`).
+- +`[contour_guard]` **16/20** (raw `baseline-20260813-011303`); guard закрыл refuse+clarify.
+- Сырьё в git: `all.jsonl` / `meta.json` / `score.json`. CLAIMS C-54/C-55 internal.
+- Verify: `eval/results/tiny-7b-hammer.md` · `tiny-7b-hammer-plus-guard.md`.
 
 ### 2026-08-13 — First 7B LoRA GGUF (hammer data)
 

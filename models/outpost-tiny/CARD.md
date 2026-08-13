@@ -42,6 +42,7 @@ Do **not** promote micro / diverse / agent* for a pilot. They are experiments;
 
 | ID | GGUF | Size | SHA256 (disk) | Recorded SHA |
 |---|---|---|---|---|
+| 7b-holes | `artifacts/outpost-tiny-7b-holes.Q4_K_M.gguf` | 4.36 GiB | `6ae0442fdf93422c…99ca` | match |
 | 7b-hammer (first 7B LoRA) | `artifacts/outpost-tiny-7b-hammer.Q4_K_M.gguf` | 4.36 GiB | `1ed25d6d2cbb2b01…ba28` | match |
 | hammer2 (pilot) | `artifacts/outpost-tiny-hammer.Q4_K_M.gguf` | 1.80 GiB | `3a7129549bf19c69…6e8c` | match |
 | hammer2 (second copy) | `artifacts/outpost-tiny-hammer2.Q4_K_M.gguf` | 1.80 GiB | `3a7129549bf19c69…6e8c` | **none on disk** |
@@ -66,6 +67,10 @@ Same bytes under different names: the file name does not identify a run.
 
 | Model | Sheet | Setup | Score | Per-id source | Report | Raw evidence |
 |---|---|---|---|---|---|---|
+| 7b-holes | prompts.ru.jsonl (N=10) | GGUF alone, guard off | **15/20** | not broken out | `eval/results/tiny-7b-holes.md` | `baseline-20260813-012823` 25 files |
+| 7b-holes | prompts.ru.jsonl (N=10) | + Commercial `[contour_guard]` (ADR-047) | **19/20** | 8 model / 2 runtime (of 10) | `eval/results/tiny-7b-holes-plus-guard.md` | `baseline-20260813-022607` 25 files |
+| 7b-hammer | prompts.ru.jsonl (N=10) | GGUF alone, guard off | **12/20** | not broken out | `eval/results/tiny-7b-hammer.md` | `baseline-20260813-011118` 25 files |
+| 7b-hammer | prompts.ru.jsonl (N=10) | + Commercial `[contour_guard]` (ADR-047) | **16/20** | 8 model / 2 runtime (of 10) | `eval/results/tiny-7b-hammer-plus-guard.md` | `baseline-20260813-011303` 25 files |
 | hammer2 | prompts.ru.jsonl (N=10) | GGUF alone, guard off | **17/20** | not broken out | `eval/results/tiny-hammer-ladder.md` | **no raw dir referenced** |
 | hammer2 | prompts.ru.jsonl (N=10) | + Commercial `[contour_guard]` (ADR-047) | **20/20** | 7 model / 3 runtime (of 10) | `eval/results/tiny-hammer2-plus-guard.md` | **no raw dir referenced** |
 | hammer2 | prompts/agent-v0.jsonl (N=10) | GGUF alone, guard off | **16/20** | not broken out | `eval/results/agent-v0-hammer2-baseline.md` | `agent-v0-hammer2-20260729-181042` 23 files |

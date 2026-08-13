@@ -1,0 +1,25 @@
+# Same 7B holes LoRA + Commercial contour_guard (ADR-047).
+
+[server]
+host = "127.0.0.1"
+port = 8099
+
+[models]
+dir = "/Users/valentin/Projects/neurolab/artifacts"
+active = "outpost-tiny-7b-holes"
+path = "/Users/valentin/Projects/neurolab/artifacts/outpost-tiny-7b-holes.Q4_K_M.gguf"
+
+[inference]
+memory_limit_mb = 10240
+threads = 4
+context_size = 4096
+chat_template = "chatml"
+system_prompt = ""
+
+[audit]
+enabled = true
+log_path = "/Users/valentin/Projects/neurolab/artifacts/tiny-7b-holes-guard-audit.jsonl"
+log_prompt_content = false
+
+[contour_guard]
+enabled = true

@@ -48,6 +48,7 @@ LICENSE_CANDIDATES = (
 
 # id -> GGUF file under artifacts/. Order is the order printed in the card.
 ARTIFACTS = (
+    ("7b-holes", "outpost-tiny-7b-holes.Q4_K_M.gguf"),
     ("7b-hammer (first 7B LoRA)", "outpost-tiny-7b-hammer.Q4_K_M.gguf"),
     ("hammer2 (pilot)", "outpost-tiny-hammer.Q4_K_M.gguf"),
     ("hammer2 (second copy)", "outpost-tiny-hammer2.Q4_K_M.gguf"),
@@ -66,6 +67,36 @@ ARTIFACTS = (
 # Model score and model+runtime score always stay separate rows. ``row`` is the
 # substring identifying the line in the report that carries the number.
 EVAL = (
+    {
+        "model": "7b-holes",
+        "sheet": "prompts.ru.jsonl (N=10)",
+        "setup": "GGUF alone, guard off",
+        "report": "eval/results/tiny-7b-holes.md",
+        "row": "| **7b-holes** |",
+    },
+    {
+        "model": "7b-holes",
+        "sheet": "prompts.ru.jsonl (N=10)",
+        "setup": "+ Commercial `[contour_guard]` (ADR-047)",
+        "report": "eval/results/tiny-7b-holes-plus-guard.md",
+        "row": "| **Full** |",
+        "split": True,
+    },
+    {
+        "model": "7b-hammer",
+        "sheet": "prompts.ru.jsonl (N=10)",
+        "setup": "GGUF alone, guard off",
+        "report": "eval/results/tiny-7b-hammer.md",
+        "row": "| **7b-hammer** |",
+    },
+    {
+        "model": "7b-hammer",
+        "sheet": "prompts.ru.jsonl (N=10)",
+        "setup": "+ Commercial `[contour_guard]` (ADR-047)",
+        "report": "eval/results/tiny-7b-hammer-plus-guard.md",
+        "row": "| **Full** |",
+        "split": True,
+    },
     {
         "model": "hammer2",
         "sheet": "prompts.ru.jsonl (N=10)",

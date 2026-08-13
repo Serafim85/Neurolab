@@ -39,6 +39,12 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--lr", type=float, default=1e-5)
     p.add_argument("--python", default=sys.executable)
     p.add_argument(
+        "--resume-adapter",
+        type=Path,
+        default=None,
+        help="mlx-lm --resume-adapter-file (e.g. prior adapters.safetensors)",
+    )
+    p.add_argument(
         "--export-gguf",
         action="store_true",
         help="After train: fuse --dequantize, convert_hf_to_gguf, llama-quantize Q4_K_M",
@@ -80,6 +86,7 @@ def write_notes(run_dir: Path, args: argparse.Namespace, n_train: int, iters: in
             f"- data: `{args.data}` (n={n_train})",
             f"- iters: {iters} · batch {args.batch_size} · seq {args.max_seq_len} · layers {args.num_layers}",
             f"- adapter: `{run_dir / 'adapter'}`",
+            f"- resume: `{args.resume_adapter}`" if args.resume_adapter else "- resume: none",
             "- 3B GGUFs on disk remain research-only; do not ship them commercially.",
             "",
         ]
@@ -187,6 +194,11 @@ def main() -> int:
             "--val-batches",
             "1",
         ]
+        if args.resume_adapter is not None:
+            resume = args.resume_adapter.expanduser().resolve()
+            if not resume.is_file():
+                raise FileNotFoundError(f"resume adapter missing: {resume}")
+            cmd += ["--resume-adapter-file", str(resume)]
         run(cmd)
         write_notes(run_dir, args, n_train, iters)
         print(f"OK adapter → {adapter}")

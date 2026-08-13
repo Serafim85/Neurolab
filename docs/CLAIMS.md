@@ -28,6 +28,8 @@
 
 ## 1. Outpost-Tiny — контурный чат (лист `eval/prompts.ru.jsonl`, N=10)
 
+Строки C-01–C-06 — **3B / `qwen-research`, historical**. Locked base с NL-ADR-028 — 7B; его цифры — C-54–C-57, не перенос 17/20.
+
 Это флагманская цифра лаборатории, и именно её проще всего испортить copy-paste'ом.
 
 | # | Заявление (цитировать дословно) | Источник | Оговорка | Уровень |
@@ -38,6 +40,10 @@
 | **C-04** | — | `ru_formal` = 2 в `eval/results/tiny-micro-vs-hammer2.md` vs `ru_formal` = 1 в единственном подтверждённом hammer2-прогоне того дня — `eval/results/raw/baseline-20260721-163032` (`meta.txt` = hammer2; ответ в одно предложение и с обратным смыслом) | **Один и тот же GGUF записан с двумя разными баллами на одном id.** Пока нет автоскорера и повторов, дельта ±1 — шум. Наружу не цитируется вообще | `internal` |
 | **C-05** | — | `.gitignore` строка `eval/results/raw/`; `eval/results/raw/baseline-20260721-170217/` пустая | **Сырых по-промптных ответов прогона 20/20 на диске нет**, каталог пустой, и raw в git не входит. Единственная запись — таблица в markdown. Внешнюю верификацию C-02 сегодня обеспечить нечем | `internal` |
 | **C-06** | «micro — 17/20, diverse — 16/20; ни та, ни другая не продвинута в пилот» | `eval/results/tiny-micro-vs-hammer2.md`; `STATUS.md` ladder | Те же оговорки, что у C-01. «17 = 17» здесь означает «регресса нет», а не «улучшение» | `public` |
+| **C-54** | «Первый 7B LoRA (`outpost-tiny-7b-hammer`, Apache-2.0) на том же контурном листе даёт **12 из 20** без runtime-guard» | `eval/results/tiny-7b-hammer.md`; raw `eval/results/raw/baseline-20260813-011118` (`all.jsonl`, `score.json`) | Один прогон, temp 0.2, оценка вручную. Это **не** 3B 17/20 и **не** demo bar. Нули: `ru_refuse_cloud`, `contour_clarify`, `long_ctx_short`. Наружу как «наш 7B лучше 3B» — нельзя | `internal` |
+| **C-55** | «Тот же 7B GGUF плюс `[contour_guard]` даёт **16 из 20**; 2 из 10 пунктов закрывает runtime (`ru_refuse_cloud`, `contour_clarify`)» | `eval/results/tiny-7b-hammer-plus-guard.md`; raw `eval/results/raw/baseline-20260813-011303` | Продукт, не модель. `ru_formal` на этом прогоне закрыла сеть, не guard. Остаются `long_ctx_short` 0, `ru_bullets` 1, `contour_allow_client` 1. Не цитировать как 20/20 | `internal` |
+| **C-56** | «7B holes LoRA (`outpost-tiny-7b-holes`) на том же листе даёт **15 из 20** без runtime-guard» | `eval/results/tiny-7b-holes.md`; raw `eval/results/raw/baseline-20260813-012823` | Resume с hammer2-адаптера, 18 примеров, 36 iters. Закрыты `long_ctx_short` и `ru_bullets`. `contour_allow_client` остаётся 1. Не 3B 17/20 | `internal` |
+| **C-57** | «Тот же 7B holes GGUF плюс `[contour_guard]` даёт **19 из 20**; 2 из 10 пунктов закрывает runtime» | `eval/results/tiny-7b-holes-plus-guard.md`; raw `eval/results/raw/baseline-20260813-022607` | Продукт, не модель. Дыра: `contour_allow_client` = 1 (API Gateway). Не цитировать как 20/20 | `internal` |
 
 **Разрешённый абзац наружу (RU).** Копировать целиком, не по частям:
 
@@ -117,7 +123,7 @@ NL-ADR-020…024.
 | **C-50** | «Юнит-набор песочницы: **85 passed** (`pytest -m "not integration"`), плюс шлюз одной командой `scripts/gate.sh` — 6 шагов, GATE: PASS» | Прогон 2026-08-08 на коммите `e030e9e`; CI — `.github/workflows/`; шлюз — `scripts/gate.sh` | Это тесты **нашего кода**, а не валидация научных результатов: golden-файлы фиксируют формат отчёта, а не физику. Было 51 до треков E/F/I — при цитировании брать число из свежего прогона, а не из этой строки | `public` |
 | **C-51** | «Интеграционные тесты `ask` ↔ Outpost: 3 passed» | `docs/CLOSED-SANDBOX-VERIFY.md`; `sandbox/tests/test_ask_outpost.py`, `sandbox/tests/test_ask_cli.py` | Требуют Metal/GPU-хоста, GGUF и Commercial-бинарника; в общем прогоне не участвуют | `public` |
 | **C-52** | «Demo pack: 6 pass / 0 fail на прогоне доменов» | `docs/DEMO-PACK-SANDBOX.md` §2; `sandbox/scripts/demo_pack.sh` | «6» — число примеров, которые отработали без ошибки, **не** число проверенных научных утверждений | `public` |
-| **C-53** | — | `docs/BASE-LICENSE.md`; NL-ADR-028 Accepted 2026-08-13 | **Locked base = Qwen2.5-7B-Instruct, Apache-2.0.** Все 3B GGUF (`hammer` и остальные) остаются производными `qwen-research` — research-only, не в пилотный пак. Коммерческая поставка 7B — только после GGUF 7B на диске и eval на новой базе; цифры 17/20 и 20/20 с 3B **не переносятся** | `internal` |
+| **C-53** | — | `docs/BASE-LICENSE.md`; NL-ADR-028 Accepted 2026-08-13 | **Locked base = Qwen2.5-7B-Instruct, Apache-2.0.** Все 3B GGUF (`hammer` и остальные) остаются производными `qwen-research` — research-only, не в пилотный пак. GGUF 7B на диске; eval — C-54–C-57. Цифры 17/20 и 20/20 с 3B **не переносятся** | `internal` |
 
 ---
 

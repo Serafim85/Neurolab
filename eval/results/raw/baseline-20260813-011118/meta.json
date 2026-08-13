@@ -1,0 +1,13 @@
+{
+  "base_url": "http://127.0.0.1:8098",
+  "model": "outpost-tiny-7b-hammer",
+  "gguf": "artifacts/outpost-tiny-7b-hammer.Q4_K_M.gguf",
+  "sha256": "1ed25d6d2cbb2b01c154df4dfca9fa27ad4c57b660c8c1b9d969adfcbc54ba28",
+  "temperature": 0.2,
+  "max_tokens": 256,
+  "prompts": "/Users/valentin/Projects/neurolab/eval/prompts.ru.jsonl",
+  "n": 10,
+  "stamp": "20260813-011118",
+  "contour_guard": false,
+  "config": "config/sovereign.tiny-7b-hammer.toml"
+}
