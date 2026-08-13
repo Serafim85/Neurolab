@@ -69,6 +69,24 @@ def test_overview_page_and_projects(ui_server: int) -> None:
     assert data["n"] >= 6
     ids = {p["id"] for p in data["projects"]}
     assert "anomaly-v0" in ids
+    chip = next(p for p in data["projects"] if p["id"] == "chip-estimate-v0")
+    assert chip["metric_primary"] == "chip_fit_score"
+
+
+def test_overview_metric_fields_generic() -> None:
+    from closed_sandbox.ui_server import _overview_metric_fields
+
+    project = {"task": {"metric_primary": "fit_score"}}
+    idle = _overview_metric_fields(project, None)
+    assert idle == {"metric_primary": "fit_score"}
+    ran = _overview_metric_fields(
+        project,
+        {"metric_primary": "fit_score", "fit_score": 0.81, "budget_ok": True},
+    )
+    assert ran["metric_primary"] == "fit_score"
+    assert ran["fit_score"] == 0.81
+    assert "f1" not in ran
+    assert "spike_count" not in ran
 
 
 def test_editor_page_manifest_validate(ui_server: int) -> None:

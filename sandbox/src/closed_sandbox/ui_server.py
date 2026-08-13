@@ -31,6 +31,17 @@ SANDBOX_ROOT = Path(__file__).resolve().parents[2]
 UI_ROOT = SANDBOX_ROOT / "ui"
 DEFAULT_PROJECT = SANDBOX_ROOT / "examples" / "anomaly_v0" / "project.toml"
 
+# Overview copies these from metrics.json when present (NL-ADR-025 / leftover L).
+OVERVIEW_METRIC_KEYS = (
+    "f1",
+    "accuracy",
+    "fit_score",
+    "chip_fit_score",
+    "spike_count",
+    "synops",
+    "latency_proxy_ms",
+)
+
 # Shared last-run artifacts for export (one session process).
 _lock = threading.Lock()
 _last: dict[str, Any] = {
@@ -222,6 +233,28 @@ def _pick_metrics_file(out_dir: Path) -> Path | None:
     return max(candidates, key=lambda p: p.stat().st_mtime)
 
 
+def _overview_metric_fields(
+    project: dict[str, Any] | None,
+    metrics: dict[str, Any] | None,
+) -> dict[str, Any]:
+    """Primary + whatever quality/cost keys the last run actually reported."""
+    task = (project or {}).get("task") or {}
+    primary = None
+    if metrics and metrics.get("metric_primary"):
+        primary = metrics["metric_primary"]
+    elif task.get("metric_primary"):
+        primary = task["metric_primary"]
+    out: dict[str, Any] = {"metric_primary": primary}
+    keys = list(OVERVIEW_METRIC_KEYS)
+    if isinstance(primary, str) and primary and primary not in keys:
+        keys.append(primary)
+    if metrics:
+        for key in keys:
+            if key in metrics:
+                out[key] = metrics[key]
+    return out
+
+
 def _list_projects() -> dict[str, Any]:
     examples = SANDBOX_ROOT / "examples"
     rows: list[dict[str, Any]] = []
@@ -238,8 +271,7 @@ def _list_projects() -> dict[str, Any]:
                         "rel": str(proj_path.relative_to(SANDBOX_ROOT)),
                         "status": "invalid",
                         "error": str(exc),
-                        "f1": None,
-                        "spike_count": None,
+                        "metric_primary": None,
                         "budget_ok": None,
                         "last_run": None,
                     }
@@ -261,22 +293,19 @@ def _list_projects() -> dict[str, Any]:
                 status = "budget"
             else:
                 status = "ok"
-            rows.append(
-                {
-                    "id": project["project"]["id"],
-                    "name": project["project"].get("name", ""),
-                    "domain": project["project"]["domain"],
-                    "path": str(proj_path),
-                    "rel": str(proj_path.relative_to(SANDBOX_ROOT)),
-                    "status": status,
-                    "f1": metrics.get("f1") if metrics else None,
-                    "accuracy": metrics.get("accuracy") if metrics else None,
-                    "spike_count": metrics.get("spike_count") if metrics else None,
-                    "budget_ok": budget,
-                    "last_run": last_run,
-                    "metrics_path": str(metrics_path) if metrics_path else None,
-                }
-            )
+            row = {
+                "id": project["project"]["id"],
+                "name": project["project"].get("name", ""),
+                "domain": project["project"]["domain"],
+                "path": str(proj_path),
+                "rel": str(proj_path.relative_to(SANDBOX_ROOT)),
+                "status": status,
+                "budget_ok": budget,
+                "last_run": last_run,
+                "metrics_path": str(metrics_path) if metrics_path else None,
+            }
+            row.update(_overview_metric_fields(project, metrics))
+            rows.append(row)
     return {"ok": True, "projects": rows, "n": len(rows)}
 
 

@@ -1,0 +1,25 @@
+# Same 7B VPC LoRA + contour_guard.
+
+[server]
+host = "127.0.0.1"
+port = 8099
+
+[models]
+dir = "/Users/valentin/Projects/neurolab/artifacts"
+active = "outpost-tiny-7b-vpc"
+path = "/Users/valentin/Projects/neurolab/artifacts/outpost-tiny-7b-vpc.Q4_K_M.gguf"
+
+[inference]
+memory_limit_mb = 10240
+threads = 4
+context_size = 4096
+chat_template = "chatml"
+system_prompt = ""
+
+[audit]
+enabled = true
+log_path = "/Users/valentin/Projects/neurolab/artifacts/tiny-7b-vpc-guard-audit.jsonl"
+log_prompt_content = false
+
+[contour_guard]
+enabled = true

@@ -42,6 +42,7 @@ Do **not** promote micro / diverse / agent* for a pilot. They are experiments;
 
 | ID | GGUF | Size | SHA256 (disk) | Recorded SHA |
 |---|---|---|---|---|
+| 7b-vpc | `artifacts/outpost-tiny-7b-vpc.Q4_K_M.gguf` | 4.36 GiB | `f5a5b69d785f1918…0ea5` | match |
 | 7b-holes | `artifacts/outpost-tiny-7b-holes.Q4_K_M.gguf` | 4.36 GiB | `6ae0442fdf93422c…99ca` | match |
 | 7b-hammer (first 7B LoRA) | `artifacts/outpost-tiny-7b-hammer.Q4_K_M.gguf` | 4.36 GiB | `1ed25d6d2cbb2b01…ba28` | match |
 | hammer2 (pilot) | `artifacts/outpost-tiny-hammer.Q4_K_M.gguf` | 1.80 GiB | `3a7129549bf19c69…6e8c` | match |
@@ -67,6 +68,8 @@ Same bytes under different names: the file name does not identify a run.
 
 | Model | Sheet | Setup | Score | Per-id source | Report | Raw evidence |
 |---|---|---|---|---|---|---|
+| 7b-vpc | prompts.ru.jsonl (N=10) | GGUF alone, guard off | **17/20** | not broken out | `eval/results/tiny-7b-vpc.md` | `baseline-20260813-164825` 25 files |
+| 7b-vpc | prompts.ru.jsonl (N=10) | + Commercial `[contour_guard]` (ADR-047) | **20/20** | 8 model / 2 runtime (of 10) | `eval/results/tiny-7b-vpc-plus-guard.md` | `baseline-20260813-164949` 25 files |
 | 7b-holes | prompts.ru.jsonl (N=10) | GGUF alone, guard off | **15/20** | not broken out | `eval/results/tiny-7b-holes.md` | `baseline-20260813-012823` 25 files |
 | 7b-holes | prompts.ru.jsonl (N=10) | + Commercial `[contour_guard]` (ADR-047) | **19/20** | 8 model / 2 runtime (of 10) | `eval/results/tiny-7b-holes-plus-guard.md` | `baseline-20260813-022607` 25 files |
 | 7b-hammer | prompts.ru.jsonl (N=10) | GGUF alone, guard off | **12/20** | not broken out | `eval/results/tiny-7b-hammer.md` | `baseline-20260813-011118` 25 files |

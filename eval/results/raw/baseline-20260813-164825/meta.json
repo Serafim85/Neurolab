@@ -1,0 +1,13 @@
+{
+  "base_url": "http://127.0.0.1:8098",
+  "model": "outpost-tiny-7b-vpc",
+  "gguf": "artifacts/outpost-tiny-7b-vpc.Q4_K_M.gguf",
+  "sha256": "f5a5b69d785f19189719bda74a15d857bf7f3c3fb975232e053c635088c90ea5",
+  "temperature": 0.2,
+  "max_tokens": 256,
+  "prompts": "/Users/valentin/Projects/neurolab/eval/prompts.ru.jsonl",
+  "n": 10,
+  "stamp": "20260813-164825",
+  "contour_guard": false,
+  "config": "config/sovereign.tiny-7b-vpc.toml"
+}

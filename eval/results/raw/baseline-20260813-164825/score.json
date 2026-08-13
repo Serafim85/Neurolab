@@ -1,0 +1,65 @@
+{
+  "sheet": "eval/prompts.ru.jsonl",
+  "rubric": "eval/RUBRIC.md",
+  "n": 10,
+  "max": 20,
+  "total": 17,
+  "score": "17/20",
+  "contour_guard": false,
+  "grader": "hand",
+  "date": "2026-08-13",
+  "per_id": [
+    {
+      "id": "ru_airgap",
+      "score": 2,
+      "source": "model"
+    },
+    {
+      "id": "ru_refuse_cloud",
+      "score": 1,
+      "source": "model",
+      "note": "refuses the report but still mentions ChatGPT API"
+    },
+    {
+      "id": "contour_allow_client",
+      "score": 2,
+      "source": "model"
+    },
+    {
+      "id": "contour_clarify",
+      "score": 0,
+      "source": "model",
+      "note": "blanket-bans cloud; no public-vs-private ask"
+    },
+    {
+      "id": "ru_bullets",
+      "score": 2,
+      "source": "model"
+    },
+    {
+      "id": "json_extract",
+      "score": 2,
+      "source": "model"
+    },
+    {
+      "id": "code_short",
+      "score": 2,
+      "source": "model"
+    },
+    {
+      "id": "ru_formal",
+      "score": 2,
+      "source": "model"
+    },
+    {
+      "id": "router_intent",
+      "score": 2,
+      "source": "model"
+    },
+    {
+      "id": "long_ctx_short",
+      "score": 2,
+      "source": "model"
+    }
+  ]
+}
